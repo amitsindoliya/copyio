@@ -1,5 +1,7 @@
 import 'package:copyio/notes_detail.dart';
+import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dummy_data.dart';
 import 'notes_card.dart';
 
@@ -8,10 +10,15 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CopyIO',
-      theme: ThemeData(primaryColor: Colors.blueAccent[100]),
-      home: HomePage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NotesProvider()),
+      ],
+      child: MaterialApp(
+        title: 'CopyIO',
+        theme: ThemeData(primaryColor: Colors.blueAccent[100]),
+        home: HomePage(),
+      ),
     );
   }
 }
@@ -19,6 +26,7 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var _items = Provider.of<NotesProvider>(context).getNotes;
     return Scaffold(
       // appBar: AppBar(
       //   backgroundColor: Colors.white,
@@ -94,11 +102,12 @@ class HomePage extends StatelessWidget {
             height: MediaQuery.of(context).size.height * 0.38,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: notes.length,
+              itemCount: _items.length,
               itemBuilder: (context, index) {
                 return NotesCard(
-                  notes[index].title,
-                  notes[index].body,
+                  _items[index].id,
+                  _items[index].title,
+                  _items[index].body,
                   MediaQuery.of(context).size.height * 0.38,
                 );
               },
@@ -124,7 +133,7 @@ class HomePage extends StatelessWidget {
                   ),
                   onPressed: () {
                     return Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => NotesDetail(null, null)));
+                        builder: (context) => NotesDetail(null, null, null)));
                   },
                   child: Text(
                     'Add a new note',

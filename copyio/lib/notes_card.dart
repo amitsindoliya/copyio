@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'notes_detail.dart';
 
 class NotesCard extends StatelessWidget {
+  final String id;
   final String title;
   final String body;
   final double height;
 
-  NotesCard(this.title, this.body, this.height);
+  NotesCard(this.id, this.title, this.body, this.height);
 
   notesPageNavigator(BuildContext context, title, body) {
     return Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => NotesDetail(title, body)));
+        MaterialPageRoute(builder: (context) => NotesDetail(id, title, body)));
   }
 
   @override

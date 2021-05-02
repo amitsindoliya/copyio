@@ -1,6 +1,6 @@
 import 'package:copyio/models/notes.dart';
 import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
+import 'package:provider/provider.dart';
 
 class NotesProvider with ChangeNotifier {
   List<Notes> _notesList = [
@@ -41,6 +41,12 @@ class NotesProvider with ChangeNotifier {
 
   void setNotes(Notes note) {
     _notesList.add(note);
+    notifyListeners();
+  }
+
+  void changeById(Notes note) {
+    int updateIndex = _notesList.indexWhere((oldnote) => oldnote.id == note.id);
+    _notesList[updateIndex] = note;
     notifyListeners();
   }
 }

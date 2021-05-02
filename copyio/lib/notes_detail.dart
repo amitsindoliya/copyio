@@ -1,11 +1,15 @@
 import 'package:copyio/dummy_data.dart';
 import 'package:copyio/models/notes.dart';
+import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class NotesDetail extends StatefulWidget {
+  final String id;
   final String title;
   final String body;
   NotesDetail(
+    this.id,
     this.title,
     this.body,
   );
@@ -23,8 +27,32 @@ class _NotesDetailState extends State<NotesDetail> {
   );
   void _saveForm() {
     _fkey.currentState.save();
-    notes.add(_sampleNote);
+    if (_sampleNote.id == '') {
+      Provider.of<NotesProvider>(context, listen: false).setNotes(_sampleNote);
+    } else {
+      Provider.of<NotesProvider>(context, listen: false)
+          .changeById(_sampleNote);
+    }
     Navigator.of(context).pop();
+  }
+
+  bool _editFlag = true;
+
+  @override
+  void didChangeDependencies() {
+    if (_editFlag) {
+      if (widget.id != null) {
+        _sampleNote = Notes(
+          id: widget.id,
+          title: widget.title,
+          body: widget.body,
+        );
+      }
+    }
+
+    _editFlag = false;
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
   }
 
   @override
@@ -82,6 +110,7 @@ class _NotesDetailState extends State<NotesDetail> {
                             // controller: _titlecontroller,
                             // title,
                             // key: k1,
+                            initialValue: _sampleNote.title,
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
                               fontSize: 24.0,
@@ -97,7 +126,7 @@ class _NotesDetailState extends State<NotesDetail> {
                             ),
                             onSaved: (text) {
                               _sampleNote = Notes(
-                                id: DateTime.now().toString(),
+                                id: _sampleNote.id,
                                 title: text,
                                 body: _sampleNote.body,
                               );
@@ -108,6 +137,7 @@ class _NotesDetailState extends State<NotesDetail> {
                           ),
                           Expanded(
                             child: TextFormField(
+                              initialValue: _sampleNote.body,
                               keyboardType: TextInputType.multiline,
                               maxLines: null,
                               // autofocus: true,
