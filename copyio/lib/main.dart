@@ -1,5 +1,6 @@
 import 'package:copyio/notes_detail.dart';
 import 'package:copyio/providers/notes_provider.dart';
+import 'package:copyio/viewall.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dummy_data.dart';
@@ -102,49 +103,20 @@ class HomePage extends StatelessWidget {
             height: MediaQuery.of(context).size.height * 0.38,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: _items.length,
+              itemCount: _items.length > 10 ? 11 : _items.length,
               itemBuilder: (context, index) {
-                return NotesCard(
-                  _items[index].id,
-                  _items[index].title,
-                  _items[index].body,
-                  MediaQuery.of(context).size.height * 0.38,
-                );
+                if (index < 10) {
+                  return NotesCard(
+                    _items[index],
+                    MediaQuery.of(context).size.height * 0.38,
+                  );
+                } else {
+                  return ViewAll();
+                }
               },
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 10.0, 0),
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                      Colors.blueAccent[100],
-                    ),
-                    elevation: MaterialStateProperty.all<double>(0.0),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                    // RoundedRectangleBorder(borderRasdius: BorderRadius.circular(30)),
-                  ),
-                  onPressed: () {
-                    return Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => NotesDetail(null, null, null)));
-                  },
-                  child: Text(
-                    'Add a new note',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          )
+          NewNote(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -170,6 +142,48 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class NewNote extends StatelessWidget {
+  const NewNote({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 0, 10.0, 0),
+          child: ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(
+                Colors.blueAccent[100],
+              ),
+              elevation: MaterialStateProperty.all<double>(2.0),
+              shape: MaterialStateProperty.all<OutlinedBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              // RoundedRectangleBorder(borderRasdius: BorderRadius.circular(30)),
+            ),
+            onPressed: () {
+              return Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => NotesDetail(null, null, null, null)));
+            },
+            child: Text(
+              'Add a new note',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -8,11 +8,8 @@ class NotesDetail extends StatefulWidget {
   final String id;
   final String title;
   final String body;
-  NotesDetail(
-    this.id,
-    this.title,
-    this.body,
-  );
+  final DateTime time;
+  NotesDetail(this.id, this.title, this.body, this.time);
 
   @override
   _NotesDetailState createState() => _NotesDetailState();
@@ -28,8 +25,20 @@ class _NotesDetailState extends State<NotesDetail> {
   void _saveForm() {
     _fkey.currentState.save();
     if (_sampleNote.id == '') {
+      _sampleNote = Notes(
+        id: DateTime.now().toString(),
+        title: _sampleNote.title,
+        body: _sampleNote.body,
+        generatedTime: DateTime.now(),
+      );
       Provider.of<NotesProvider>(context, listen: false).setNotes(_sampleNote);
     } else {
+      _sampleNote = Notes(
+        id: _sampleNote.id,
+        title: _sampleNote.title,
+        body: _sampleNote.body,
+        generatedTime: DateTime.now(),
+      );
       Provider.of<NotesProvider>(context, listen: false)
           .changeById(_sampleNote);
     }
@@ -41,12 +50,13 @@ class _NotesDetailState extends State<NotesDetail> {
   @override
   void didChangeDependencies() {
     if (_editFlag) {
+      print(widget.id);
       if (widget.id != null) {
         _sampleNote = Notes(
-          id: widget.id,
-          title: widget.title,
-          body: widget.body,
-        );
+            id: widget.id,
+            title: widget.title,
+            body: widget.body,
+            generatedTime: widget.time);
       }
     }
 
@@ -113,12 +123,13 @@ class _NotesDetailState extends State<NotesDetail> {
                             initialValue: _sampleNote.title,
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
-                              fontSize: 24.0,
+                              fontSize: 26.0,
                               fontWeight: FontWeight.bold,
                             ),
                             decoration: InputDecoration(
                               // border: InputBorder.none,
                               hintText: 'Title',
+                              border: InputBorder.none,
                               hintStyle: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 color: Colors.blueGrey,
@@ -132,9 +143,22 @@ class _NotesDetailState extends State<NotesDetail> {
                               );
                             },
                           ),
-                          SizedBox(
-                            height: 15.0,
-                          ),
+                          _sampleNote.generatedTime != null
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      _sampleNote.generatedTime
+                                          .toString()
+                                          .split('.')[0],
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                )
+                              : Text(''),
+                          // SizedBox(
+                          //   height: 5.0,
+                          // ),
                           Expanded(
                             child: TextFormField(
                               initialValue: _sampleNote.body,
@@ -143,7 +167,7 @@ class _NotesDetailState extends State<NotesDetail> {
                               // autofocus: true,
                               // controller: _bodyController,
                               style: TextStyle(
-                                fontSize: 16.0,
+                                fontSize: 18.0,
                               ),
                               decoration: InputDecoration(
                                 border: InputBorder.none,
