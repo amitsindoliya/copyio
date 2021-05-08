@@ -2,6 +2,7 @@ import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:copyio/home.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:copyio/notes_detail.dart';
+import 'package:copyio/providers/groups_provider.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:copyio/viewall.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => NotesProvider()),
+        ChangeNotifierProvider(
+          create: (_) => NotesProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GroupProvider(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

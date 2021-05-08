@@ -1,6 +1,8 @@
+import 'package:copyio/models/groups.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:copyio/notes_card.dart';
 import 'package:copyio/notes_detail.dart';
+import 'package:copyio/providers/groups_provider.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:copyio/viewall.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +15,12 @@ class Home extends StatelessWidget {
   // }) : _items = items, super(key: key);
 
   List<Notes> _items;
+  List<Group> _groups;
 
   @override
   Widget build(BuildContext context) {
     _items = Provider.of<NotesProvider>(context).getNotes;
+    _groups = Provider.of<GroupProvider>(context).getGroups;
     return Column(
       // crossAxisAlignment: CrossAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,11 +57,6 @@ class Home extends StatelessWidget {
               )
             ],
           ),
-        ),
-        ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 3,
-          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         ),
         Container(
           height: MediaQuery.of(context).size.height * 0.38,
