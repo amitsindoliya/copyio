@@ -59,6 +59,22 @@ class Home extends StatelessWidget {
           ),
         ),
         Container(
+          height: MediaQuery.of(context).size.height * 0.05,
+          child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _groups.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  padding: EdgeInsets.fromLTRB(15.0, 2.0, 15.0, 2.0),
+                  child: Text(
+                    _groups[index].groupName,
+                    style: TextStyle(
+                        fontSize: 22.0, color: Colors.blueAccent[100]),
+                  ),
+                );
+              }),
+        ),
+        Container(
           height: MediaQuery.of(context).size.height * 0.38,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,

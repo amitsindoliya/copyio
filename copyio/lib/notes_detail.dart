@@ -112,7 +112,7 @@ class _NotesDetailState extends State<NotesDetail> {
                   Icons.check_rounded,
                   color: Colors.white,
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                // onPressed: () => Navigator.of(context).pop(),
               ),
             ),
           ),

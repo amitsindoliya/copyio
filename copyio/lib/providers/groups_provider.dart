@@ -5,7 +5,7 @@ import './notes_provider.dart';
 import 'package:provider/provider.dart';
 
 class GroupProvider with ChangeNotifier {
-  List<Notes> allNotes = gtNotes();
+  // List<Notes> allNotes = gtNotes();
   List<Group> _groupsList = [
     Group(
       groupId: '1',
