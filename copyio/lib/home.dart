@@ -54,41 +54,18 @@ class Home extends StatelessWidget {
             ],
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              'All Notes',
-              style: TextStyle(
-                color: Colors.blueAccent[100],
-                fontSize: 20.0,
-                // decoration: TextDecoration.underline,
-                // decorationThickness: 4,
-              ),
-            ),
-            Text(
-              'Group1',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 20.0,
-              ),
-            ),
-            Text(
-              'Group2',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 20.0,
-              ),
-            ),
-          ],
+        ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: 3,
+          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         ),
         Container(
           height: MediaQuery.of(context).size.height * 0.38,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: _items.length > 10 ? 11 : _items.length,
+            itemCount: _items.length > 5 ? 6 : _items.length,
             itemBuilder: (context, index) {
-              if (index < 10) {
+              if (index < 5) {
                 return NotesCard(
                   _items[index],
                   MediaQuery.of(context).size.height * 0.38,

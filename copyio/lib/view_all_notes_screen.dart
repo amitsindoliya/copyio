@@ -3,7 +3,9 @@ import 'package:copyio/notes_card.dart';
 import 'package:copyio/notes_detail.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 
 class ViewAllNotesScreen extends StatelessWidget {
   @override
@@ -12,6 +14,23 @@ class ViewAllNotesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
+        leading: Container(
+          margin: EdgeInsets.all(6.0),
+          // color: Colors.black26,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(14.0),
+            ),
+            color: Colors.black12,
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: Colors.white,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
       ),
       backgroundColor: Theme.of(context).primaryColor,
       body: ClipRRect(
@@ -32,33 +51,37 @@ class ViewAllNotesScreen extends StatelessWidget {
           // height: MediaQuery.of(context).size.height * 0.38,
           child: Column(
             children: [
-              Container(
-                width: MediaQuery.of(context).size.width * 0.85,
-                // margin: EdgeInsets.fromLTRB(40, 3, 40, 3),
-                margin: EdgeInsets.symmetric(
-                  vertical: 6,
-                  horizontal: 8,
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search Notes',
-                    hintStyle: TextStyle(
-                      color: Colors.black.withAlpha(120),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'All Notes',
+                      style: TextStyle(
+                        fontSize: 36.0,
+                        fontWeight: FontWeight.bold,
+                        // color: Colors.blueAccent[100],
+                      ),
                     ),
-                    border: InputBorder.none,
-                    prefixIcon: Icon(
-                      Icons.search_sharp,
-                      color: Colors.grey,
+                    Container(
+                      margin: EdgeInsets.all(6.0),
+                      // color: Colors.black26,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(14.0),
+                        ),
+                        color: Colors.black12,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.search_rounded,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
               // SizedBox(
@@ -66,31 +89,38 @@ class ViewAllNotesScreen extends StatelessWidget {
               // ),
               Expanded(
                 // height: MediaQuery.of(context).size.height * 0.8,
-                child: GridView.builder(
-                  // scrollDirection: Axis.horizontal,
+                child: StaggeredGridView.countBuilder(
+                  crossAxisCount: 4,
                   itemCount: _allNotes.length,
-                  itemBuilder: (context, index) {
+                  itemBuilder: (BuildContext context, int index) {
+                    // print('iiii' +
+                    //     (_allNotes[index].body.length * 0.1).toString());
                     return NotesCard(
                       _allNotes[index],
-                      MediaQuery.of(context).size.height * 0.4,
+                      MediaQuery.of(context).size.height * 0.25,
                     );
                   },
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 5.0,
-                    mainAxisSpacing: 5.0,
-                    childAspectRatio: MediaQuery.of(context).size.width /
-                        (MediaQuery.of(context).size.height * 0.9),
-                  ),
+                  staggeredTileBuilder: (int index) => new StaggeredTile.count(
+                      index % 5 == 0 ? 4 : 2,
+                      index % 5 == 0
+                          ? min(2.0, _allNotes[index].body.length * 0.04) > 1
+                              ? min(2.0, _allNotes[index].body.length * 0.04)
+                              : 1.2
+                          : min(2.0, _allNotes[index].body.length * 0.04) > 1.5
+                              ? min(3.0, _allNotes[index].body.length * 0.04)
+                              : 1.5),
+                  mainAxisSpacing: 2.0,
+                  crossAxisSpacing: 2.0,
                 ),
               ),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: Icon(Icons.add),
         backgroundColor: Colors.blueAccent[100],
+        label: Text('Add'),
         onPressed: () {
           return Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => NotesDetail(

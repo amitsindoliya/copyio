@@ -54,7 +54,12 @@ class _HomePageState extends State<HomePage> {
       //   elevation: 0.0,
       // ),
       backgroundColor: Colors.white,
-      body: _widgetOptions[_currentIndex],
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.93,
+          child: _widgetOptions[_currentIndex],
+        ),
+      ),
       bottomNavigationBar: BottomNavyBar(
         selectedIndex: _currentIndex,
         showElevation: true,

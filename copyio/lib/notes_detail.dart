@@ -78,12 +78,42 @@ class _NotesDetailState extends State<NotesDetail> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
+        leading: Container(
+          margin: EdgeInsets.all(6.0),
+          // color: Colors.black26,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(14.0),
+            ),
+            color: Colors.black12,
+          ),
+          child: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: Colors.white,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
         actions: [
           InkWell(
             onTap: _saveForm,
-            child: Padding(
-              padding: EdgeInsets.only(right: 15.0),
-              child: Icon(Icons.check),
+            child: Container(
+              margin: EdgeInsets.all(6.5),
+              // color: Colors.black26,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(14.0),
+                ),
+                color: Colors.black12,
+              ),
+              child: IconButton(
+                icon: Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
             ),
           ),
         ],
@@ -120,6 +150,8 @@ class _NotesDetailState extends State<NotesDetail> {
                             // controller: _titlecontroller,
                             // title,
                             // key: k1,
+                            maxLines: null,
+                            keyboardType: TextInputType.text,
                             initialValue: _sampleNote.title,
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,

@@ -45,14 +45,17 @@ class NotesCard extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              height: height * 0.7,
-              child: Text(
-                notes.body,
-                overflow: TextOverflow.fade,
-                style: TextStyle(
-                  fontSize: 15.0,
-                  color: Colors.white54,
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.fromLTRB(0, 10.0, 0, 0),
+                // height: height * 0.7,
+                child: Text(
+                  notes.body,
+                  overflow: TextOverflow.fade,
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    color: Colors.white54,
+                  ),
                 ),
               ),
             )
