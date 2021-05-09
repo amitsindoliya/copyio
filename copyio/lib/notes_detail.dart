@@ -2,6 +2,7 @@ import 'package:copyio/dummy_data.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:provider/provider.dart';
 
 class NotesDetail extends StatefulWidget {
@@ -34,6 +35,7 @@ class _NotesDetailState extends State<NotesDetail> {
     body: '',
     group: ['1'],
   );
+
   void _saveForm() {
     _fkey.currentState.save();
     if (_sampleNote.id == '') {
@@ -43,6 +45,7 @@ class _NotesDetailState extends State<NotesDetail> {
         body: _sampleNote.body,
         generatedTime: DateTime.now(),
         group: _sampleNote.group,
+        color: _sampleNote.color,
       );
       Provider.of<NotesProvider>(context, listen: false).setNotes(_sampleNote);
     } else {
@@ -62,11 +65,12 @@ class _NotesDetailState extends State<NotesDetail> {
   }
 
   bool _editFlag = true;
-
+  Color dropdownValue;
   @override
   void didChangeDependencies() {
     if (_editFlag) {
       // print(widget.pinStatus);
+
       if (widget.id != null) {
         _sampleNote = Notes(
           id: widget.id,
@@ -85,6 +89,7 @@ class _NotesDetailState extends State<NotesDetail> {
           group: widget.group,
         );
       }
+      dropdownValue = _sampleNote.color;
     }
 
     _editFlag = false;
@@ -100,6 +105,81 @@ class _NotesDetailState extends State<NotesDetail> {
     // _bodyController = new TextEditingController();
     // _titlecontroller.text = widget.title;
     // _bodyController.text = widget.body;
+    Widget _colorPicker() {
+      return DropdownButton<Color>(
+        value: dropdownValue,
+        // icon: Container(
+        //   margin: EdgeInsets.all(6.5),
+        //   // color: Colors.black26,
+        //   decoration: BoxDecoration(
+        //     borderRadius: BorderRadius.all(
+        //       Radius.circular(14.0),
+        //     ),
+        //     color: Colors.black12,
+        //   ),
+        //   child: IconButton(
+        //     icon: Icon(
+        //       Icons.color_lens_rounded,
+        //       color: Colors.white,
+        //     ),
+        // onPressed: () {},
+        //   ),
+        // ),
+        // iconSize: 24,
+        elevation: 12,
+        underline: Container(),
+        onChanged: (Color newValue) {
+          setState(() {
+            dropdownValue = newValue;
+            _sampleNote = Notes(
+              id: _sampleNote.id,
+              title: _sampleNote.title,
+              body: _sampleNote.body,
+              color: newValue,
+              group: _sampleNote.group,
+              isPinned: _sampleNote.isPinned,
+            );
+          });
+        },
+        items: <Color>[
+          Colors.blueAccent[100],
+          Colors.redAccent[100],
+          Colors.greenAccent[100],
+          Colors.deepOrangeAccent[100],
+          Colors.red[100],
+          Colors.blue[100],
+          Colors.green[100],
+          Colors.orange[100],
+          Colors.amberAccent[100],
+          Colors.cyan[100],
+          Colors.brown[100],
+          Colors.purple[100]
+        ].map<DropdownMenuItem<Color>>((Color value) {
+          return DropdownMenuItem<Color>(
+            value: value,
+            child: Container(
+              margin: EdgeInsets.only(top: 6.5),
+              width: 37,
+              height: 37,
+              // color: value,
+              child: dropdownValue == value
+                  ? Center(
+                      child: Icon(
+                      Icons.color_lens_outlined,
+                      color: Colors.black54,
+                    ))
+                  : Text(''),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(20.0),
+                  ),
+                  border: Border.all(color: Colors.black54, width: 1.5),
+                  color: value),
+            ),
+          );
+        }).toList(),
+      );
+    }
 
     // Key k1 = GlobalKey();
     return Scaffold(
@@ -123,6 +203,7 @@ class _NotesDetailState extends State<NotesDetail> {
           ),
         ),
         actions: [
+          _colorPicker(),
           InkWell(
             onTap: _saveForm,
             child: Container(
@@ -144,8 +225,9 @@ class _NotesDetailState extends State<NotesDetail> {
             ),
           ),
         ],
+        backgroundColor: _sampleNote.color,
       ),
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: _sampleNote.color,
       body: ClipRRect(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(32.0),
@@ -181,7 +263,7 @@ class _NotesDetailState extends State<NotesDetail> {
                             keyboardType: TextInputType.text,
                             initialValue: _sampleNote.title,
                             style: TextStyle(
-                              color: Theme.of(context).primaryColor,
+                              color: _sampleNote.color,
                               fontSize: 26.0,
                               fontWeight: FontWeight.bold,
                             ),

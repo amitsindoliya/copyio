@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'notes_detail.dart';
 
-enum WhyFarther { harder, smarter, selfStarter, tradingCharter }
+enum Department {
+  treasury,
+  state,
+}
 
 class NotesCard extends StatelessWidget {
   final Notes notes;
@@ -95,26 +98,41 @@ class NotesCard extends StatelessWidget {
             notesPageNavigator(context, notes.title, notes.body);
           },
           onLongPress: () {
-            showModalBottomSheet<void>(
+            showDialog(
               context: context,
               builder: (BuildContext context) {
-                return Container(
-                  height: 110,
-                  color: Colors.white,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ModalPins('Pin', Icons.push_pin_outlined, notes),
-                        ModalPins('Delete', Icons.delete_outline, notes),
-                        ModalPins('Change color', Icons.ac_unit, notes),
-                      ],
-                    ),
-                  ),
+                return SimpleDialog(
+                  children: [
+                    ModalPins('Pin', Icons.push_pin_outlined, notes),
+                    ModalPins('Delete', Icons.delete_outline, notes),
+                    ModalPins('Add to Another Group', Icons.add, notes),
+                    ModalPins('Remove from Current Group', Icons.remove, notes),
+                    ModalPins('Change color', Icons.ac_unit, notes),
+                  ],
                 );
               },
             );
+
+            // showModalBottomSheet<void>(
+            //   context: context,
+            //   builder: (BuildContext context) {
+            //     return Container(
+            //       height: 110,
+            //       color: Colors.white,
+            //       child: Center(
+            //         child: Column(
+            //           mainAxisAlignment: MainAxisAlignment.center,
+            //           mainAxisSize: MainAxisSize.min,
+            //           children: <Widget>[
+            //             ModalPins('Pin', Icons.push_pin_outlined, notes),
+            //             ModalPins('Delete', Icons.delete_outline, notes),
+            //             ModalPins('Change color', Icons.ac_unit, notes),
+            //           ],
+            //         ),
+            //       ),
+            //     );
+            //   },
+            // );
           },
         ),
         Positioned(
@@ -170,11 +188,11 @@ class ModalPins extends StatelessWidget {
             ),
           ),
           Container(
-            width: MediaQuery.of(context).size.width / 2.5,
+            // width: double.infinity - 200,
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
             child: Text(
               text,
-              style: TextStyle(fontSize: 20.0, color: Colors.blueAccent[100]),
+              style: TextStyle(fontSize: 20.0, color: Colors.black54),
             ),
             // decoration: BoxDecoration(border: Border.all(width: 0)),
           ),
