@@ -9,7 +9,16 @@ class NotesDetail extends StatefulWidget {
   final String title;
   final String body;
   final DateTime time;
-  NotesDetail(this.id, this.title, this.body, this.time);
+  final Color color;
+  final List<String> group;
+  NotesDetail(
+    this.id,
+    this.title,
+    this.body,
+    this.time,
+    this.color,
+    this.group,
+  );
 
   @override
   _NotesDetailState createState() => _NotesDetailState();
@@ -21,6 +30,7 @@ class _NotesDetailState extends State<NotesDetail> {
     id: '',
     title: '',
     body: '',
+    group: ['1'],
   );
   void _saveForm() {
     _fkey.currentState.save();
@@ -30,15 +40,17 @@ class _NotesDetailState extends State<NotesDetail> {
         title: _sampleNote.title,
         body: _sampleNote.body,
         generatedTime: DateTime.now(),
+        group: _sampleNote.group,
       );
       Provider.of<NotesProvider>(context, listen: false).setNotes(_sampleNote);
     } else {
       _sampleNote = Notes(
-        id: _sampleNote.id,
-        title: _sampleNote.title,
-        body: _sampleNote.body,
-        generatedTime: DateTime.now(),
-      );
+          id: _sampleNote.id,
+          title: _sampleNote.title,
+          body: _sampleNote.body,
+          generatedTime: DateTime.now(),
+          color: _sampleNote.color,
+          group: _sampleNote.group);
       Provider.of<NotesProvider>(context, listen: false)
           .changeById(_sampleNote);
     }
@@ -50,13 +62,15 @@ class _NotesDetailState extends State<NotesDetail> {
   @override
   void didChangeDependencies() {
     if (_editFlag) {
-      print(widget.id);
+      // print(widget.id);
       if (widget.id != null) {
         _sampleNote = Notes(
             id: widget.id,
             title: widget.title,
             body: widget.body,
-            generatedTime: widget.time);
+            generatedTime: widget.time,
+            color: widget.color,
+            group: widget.group);
       }
     }
 
@@ -112,7 +126,7 @@ class _NotesDetailState extends State<NotesDetail> {
                   Icons.check_rounded,
                   color: Colors.white,
                 ),
-                // onPressed: () => Navigator.of(context).pop(),
+                // onPressed: () {},
               ),
             ),
           ),
@@ -172,6 +186,8 @@ class _NotesDetailState extends State<NotesDetail> {
                                 id: _sampleNote.id,
                                 title: text,
                                 body: _sampleNote.body,
+                                color: _sampleNote.color,
+                                group: _sampleNote.group,
                               );
                             },
                           ),
@@ -210,6 +226,8 @@ class _NotesDetailState extends State<NotesDetail> {
                                   id: _sampleNote.id,
                                   title: _sampleNote.title,
                                   body: text,
+                                  color: _sampleNote.color,
+                                  group: _sampleNote.group,
                                 );
                               },
                             ),

@@ -19,6 +19,8 @@ class NotesCard extends StatelessWidget {
               title,
               body,
               notes.generatedTime,
+              notes.color,
+              notes.group,
             )));
   }
 

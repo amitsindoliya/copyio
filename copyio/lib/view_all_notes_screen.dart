@@ -123,12 +123,8 @@ class ViewAllNotesScreen extends StatelessWidget {
         label: Text('Add'),
         onPressed: () {
           return Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => NotesDetail(
-                    null,
-                    null,
-                    null,
-                    null,
-                  )));
+              builder: (context) =>
+                  NotesDetail(null, null, null, null, null, ['1'])));
         },
       ),
     );

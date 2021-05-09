@@ -1,3 +1,4 @@
+import 'package:copyio/models/groups.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,39 +9,62 @@ class NotesProvider with ChangeNotifier {
         id: '10',
         title: 'First Note',
         body: 'Tried to create the first note in the app',
-        color: Colors.red[100]),
+        color: Colors.red[100],
+        group: ['1', '2']),
     Notes(
         id: '11',
         title: 'First Note123',
         body:
-            'Tried to create the first note in the app ddddddd Tried to create the first note in the app ddddddd Tried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app ddddddd'),
+            'Tried to create the first note in the app ddddddd Tried to create the first note in the app ddddddd Tried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app ddddddd',
+        group: ['1', '3']),
     Notes(
         id: '12',
         title: 'First Note789',
-        body: 'Tried to create the first note in the app fsjdsd'),
+        body: 'Tried to create the first note in the app fsjdsd',
+        group: ['1', '3']),
     Notes(
         id: '13',
         title: 'First Note8',
-        body: 'Tried to create the first note in the app sfdnfds'),
+        body: 'Tried to create the first note in the app sfdnfds',
+        group: ['1', '2']),
     Notes(
         id: '14',
         title: 'First Note4',
-        body: 'Tried to create the first note in the app jbdjxb'),
+        body: 'Tried to create the first note in the app jbdjxb',
+        group: ['1', '3']),
     Notes(
         id: '15',
         title: 'First Note4',
-        body: 'Tried to create the first note in the app dfsbfbs'),
+        body: 'Tried to create the first note in the app dfsbfbs',
+        group: ['1', '2']),
     Notes(
         id: '16',
         title: 'First Note55',
-        body: 'Tried to create the first note in the appefrf')
+        body: 'Tried to create the first note in the appefrf',
+        group: ['1', '3'])
   ];
 
   List<Notes> get getNotes {
     return [..._notesList];
   }
 
+  List<Notes> getGroup(String id) {
+    print('***' + id);
+    List<Notes> notesGroup = _notesList
+        .where(
+          (element) => element.group.contains(id),
+        )
+        .toList();
+    print(notesGroup);
+    return notesGroup;
+  }
+
+  void addToGroup(Notes note) {
+    notifyListeners();
+  }
+
   void setNotes(Notes note) {
+    print(note.group);
     _notesList.insert(0, note);
     // print(_notesList);
     notifyListeners();
