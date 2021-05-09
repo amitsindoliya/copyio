@@ -1,6 +1,8 @@
+import 'package:copyio/models/groups.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:copyio/notes_card.dart';
 import 'package:copyio/notes_detail.dart';
+import 'package:copyio/providers/groups_provider.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -8,9 +10,15 @@ import 'package:provider/provider.dart';
 import 'dart:math';
 
 class ViewAllNotesScreen extends StatelessWidget {
+  final gID;
+  ViewAllNotesScreen(this.gID);
+
   @override
   Widget build(BuildContext context) {
-    List<Notes> _allNotes = Provider.of<NotesProvider>(context).getNotes;
+    var _nodeProvider = Provider.of<NotesProvider>(context);
+    List<Notes> _allNotes = _nodeProvider.getNotes;
+    List<Notes> _currentGroup = _nodeProvider.getGroup(gID);
+    List<Group> _groups = Provider.of<GroupProvider>(context).getGroups;
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -57,7 +65,9 @@ class ViewAllNotesScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'All Notes',
+                      _groups
+                          .firstWhere((element) => element.groupId == gID)
+                          .groupName,
                       style: TextStyle(
                         fontSize: 36.0,
                         fontWeight: FontWeight.bold,
@@ -91,23 +101,28 @@ class ViewAllNotesScreen extends StatelessWidget {
                 // height: MediaQuery.of(context).size.height * 0.8,
                 child: StaggeredGridView.countBuilder(
                   crossAxisCount: 4,
-                  itemCount: _allNotes.length,
+                  itemCount: _currentGroup.length,
                   itemBuilder: (BuildContext context, int index) {
                     // print('iiii' +
                     //     (_allNotes[index].body.length * 0.1).toString());
                     return NotesCard(
-                      _allNotes[index],
+                      _currentGroup[index],
                       MediaQuery.of(context).size.height * 0.25,
+                      true,
                     );
                   },
                   staggeredTileBuilder: (int index) => new StaggeredTile.count(
                       index % 5 == 0 ? 4 : 2,
                       index % 5 == 0
-                          ? min(2.0, _allNotes[index].body.length * 0.04) > 1
-                              ? min(2.0, _allNotes[index].body.length * 0.04)
+                          ? min(2.0, _currentGroup[index].body.length * 0.04) >
+                                  1
+                              ? min(
+                                  2.0, _currentGroup[index].body.length * 0.04)
                               : 1.2
-                          : min(2.0, _allNotes[index].body.length * 0.04) > 1.5
-                              ? min(3.0, _allNotes[index].body.length * 0.04)
+                          : min(2.0, _currentGroup[index].body.length * 0.04) >
+                                  1.5
+                              ? min(
+                                  3.0, _currentGroup[index].body.length * 0.04)
                               : 1.5),
                   mainAxisSpacing: 2.0,
                   crossAxisSpacing: 2.0,
@@ -123,8 +138,8 @@ class ViewAllNotesScreen extends StatelessWidget {
         label: Text('Add'),
         onPressed: () {
           return Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) =>
-                  NotesDetail(null, null, null, null, null, ['1'])));
+              builder: (context) => NotesDetail(null, null, null, null, null,
+                  gID == '1' ? ['1'] : ['1', gID], null)));
         },
       ),
     );

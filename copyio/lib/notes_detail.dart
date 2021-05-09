@@ -11,6 +11,7 @@ class NotesDetail extends StatefulWidget {
   final DateTime time;
   final Color color;
   final List<String> group;
+  final bool pinStatus;
   NotesDetail(
     this.id,
     this.title,
@@ -18,6 +19,7 @@ class NotesDetail extends StatefulWidget {
     this.time,
     this.color,
     this.group,
+    this.pinStatus,
   );
 
   @override
@@ -45,12 +47,14 @@ class _NotesDetailState extends State<NotesDetail> {
       Provider.of<NotesProvider>(context, listen: false).setNotes(_sampleNote);
     } else {
       _sampleNote = Notes(
-          id: _sampleNote.id,
-          title: _sampleNote.title,
-          body: _sampleNote.body,
-          generatedTime: DateTime.now(),
-          color: _sampleNote.color,
-          group: _sampleNote.group);
+        id: _sampleNote.id,
+        title: _sampleNote.title,
+        body: _sampleNote.body,
+        generatedTime: DateTime.now(),
+        color: _sampleNote.color,
+        group: _sampleNote.group,
+        isPinned: _sampleNote.isPinned,
+      );
       Provider.of<NotesProvider>(context, listen: false)
           .changeById(_sampleNote);
     }
@@ -62,15 +66,24 @@ class _NotesDetailState extends State<NotesDetail> {
   @override
   void didChangeDependencies() {
     if (_editFlag) {
-      // print(widget.id);
+      // print(widget.pinStatus);
       if (widget.id != null) {
         _sampleNote = Notes(
-            id: widget.id,
-            title: widget.title,
-            body: widget.body,
-            generatedTime: widget.time,
-            color: widget.color,
-            group: widget.group);
+          id: widget.id,
+          title: widget.title,
+          body: widget.body,
+          generatedTime: widget.time,
+          color: widget.color,
+          group: widget.group,
+          isPinned: widget.pinStatus,
+        );
+      } else {
+        _sampleNote = Notes(
+          id: _sampleNote.id,
+          title: _sampleNote.title,
+          body: _sampleNote.body,
+          group: widget.group,
+        );
       }
     }
 
@@ -188,6 +201,7 @@ class _NotesDetailState extends State<NotesDetail> {
                                 body: _sampleNote.body,
                                 color: _sampleNote.color,
                                 group: _sampleNote.group,
+                                isPinned: _sampleNote.isPinned,
                               );
                             },
                           ),
@@ -228,6 +242,7 @@ class _NotesDetailState extends State<NotesDetail> {
                                   body: text,
                                   color: _sampleNote.color,
                                   group: _sampleNote.group,
+                                  isPinned: _sampleNote.isPinned,
                                 );
                               },
                             ),

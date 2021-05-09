@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'view_all_notes_screen.dart';
 
 class ViewAll extends StatelessWidget {
+  final String gID;
+  ViewAll(this.gID);
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -17,7 +19,7 @@ class ViewAll extends StatelessWidget {
             style: TextStyle(
               color: Colors.white,
               fontSize: 20.0,
-              fontStyle: FontStyle.italic,
+              // fontStyle: FontStyle.italic,
             ),
           ),
         ),
@@ -31,7 +33,7 @@ class ViewAll extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ViewAllNotesScreen(),
+            builder: (context) => ViewAllNotesScreen(gID),
           ),
         );
       },

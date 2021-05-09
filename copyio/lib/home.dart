@@ -24,6 +24,7 @@ class _HomeState extends State<Home> {
   List<Group> _groups;
 
   String _groupIndex = '1';
+  int _gInd = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -78,18 +79,39 @@ class _HomeState extends State<Home> {
                     setState(
                       () {
                         _groupIndex = _groups[index].groupId;
+                        _gInd = index;
+                        // print(_gInd.toString() + '///s');
                       },
                     );
 
                     // print(_groupIndex);
                   },
                   child: Container(
-                    padding: EdgeInsets.fromLTRB(15.0, 2.0, 15.0, 0.0),
-                    child: Text(
-                      _groups[index].groupName,
-                      style: TextStyle(
-                          fontSize: 22.0, color: Colors.blueAccent[100]),
-                    ),
+                    padding: EdgeInsets.fromLTRB(15.0, 5.0, 15.0, 0.0),
+                    child: _gInd == index
+                        ? Container(
+                            decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                    color: Colors.blueAccent[100],
+                                    width: 2,
+                                    style: BorderStyle.solid),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  _groups[index].groupName,
+                                  style: TextStyle(
+                                      fontSize: 22.0,
+                                      color: Colors.blueAccent[100]),
+                                ),
+                              ],
+                            ),
+                          )
+                        : Text(_groups[index].groupName,
+                            style:
+                                TextStyle(fontSize: 22.0, color: Colors.grey)),
                   ),
                 );
               }),
@@ -103,28 +125,28 @@ class _HomeState extends State<Home> {
                 : _itemProvider.getGroup(_groupIndex).length,
             itemBuilder: (context, index) {
               if (index < 5) {
-                print(_groupIndex);
+                // print(_groupIndex);
                 return NotesCard(
                   _itemProvider.getGroup(_groupIndex)[index],
                   MediaQuery.of(context).size.height * 0.38,
+                  false,
                 );
               } else {
-                return ViewAll();
+                return ViewAll(_groupIndex);
               }
             },
           ),
         ),
-        NewNote(),
+        NewNote(_groupIndex),
       ],
     );
   }
 }
 
 class NewNote extends StatelessWidget {
-  const NewNote({
-    Key key,
-  }) : super(key: key);
-
+  final String gID;
+  NewNote(this.gID);
+  // gIDList = gID == '1' ? ['1'] :[];
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -147,8 +169,8 @@ class NewNote extends StatelessWidget {
             ),
             onPressed: () {
               return Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      NotesDetail(null, null, null, null, null, ['1'])));
+                  builder: (context) => NotesDetail(null, null, null, null,
+                      null, gID == '1' ? ['1'] : ['1', gID], null)));
             },
             child: Text(
               'Add a new note',
