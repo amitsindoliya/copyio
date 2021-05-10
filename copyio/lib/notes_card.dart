@@ -1,4 +1,5 @@
 import 'package:copyio/models/notes.dart';
+import 'package:copyio/providers/groups_provider.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,11 +14,13 @@ class NotesCard extends StatelessWidget {
   final Notes notes;
   final double height;
   final bool isFullWidth;
+  final String gId;
 
   NotesCard(
     this.notes,
     this.height,
     this.isFullWidth,
+    this.gId,
   );
 
   notesPageNavigator(BuildContext context, title, body) {
@@ -103,11 +106,12 @@ class NotesCard extends StatelessWidget {
               builder: (BuildContext context) {
                 return SimpleDialog(
                   children: [
-                    ModalPins('Pin', Icons.push_pin_outlined, notes),
-                    ModalPins('Delete', Icons.delete_outline, notes),
-                    ModalPins('Add to Another Group', Icons.add, notes),
-                    ModalPins('Remove from Current Group', Icons.remove, notes),
-                    ModalPins('Change color', Icons.ac_unit, notes),
+                    ModalPins('Pin', Icons.push_pin_outlined, notes, gId),
+                    ModalPins('Delete', Icons.delete_outline, notes, gId),
+                    ModalPins('Add to Another Group', Icons.add, notes, gId),
+                    ModalPins(
+                        'Remove from Current Group', Icons.remove, notes, gId),
+                    ModalPins('Change color', Icons.ac_unit, notes, gId),
                   ],
                 );
               },
@@ -152,12 +156,14 @@ class ModalPins extends StatelessWidget {
   String text;
   IconData icons;
   Notes note;
-  ModalPins(this.text, this.icons, this.note);
+  final String gId;
+  ModalPins(this.text, this.icons, this.note, this.gId);
   var _iconColor = Colors.blueAccent[100];
 
   @override
   Widget build(BuildContext context) {
     var _provider = Provider.of<NotesProvider>(context);
+    var _groupProvider = Provider.of<GroupProvider>(context);
     if (text == 'Delete') {
       _iconColor = Colors.blueAccent[100];
     } else if (text == 'Pin') {
@@ -175,6 +181,45 @@ class ModalPins extends StatelessWidget {
         } else if (text == 'Delete') {
           _provider.deleteById(note.id);
           Navigator.of(context).pop();
+        } else if (text == 'Remove from Current Group') {
+          if (gId == '1') {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return SimpleDialog(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 28.0),
+                        child: Text(
+                          'This Action will delete the note. Are you Sure?',
+                          style: TextStyle(color: Colors.grey, fontSize: 20.0),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          _provider.deleteById(note.id);
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Yes',
+                          style: TextStyle(color: Colors.green, fontSize: 18.0),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text(
+                          'No',
+                          style: TextStyle(color: Colors.red, fontSize: 18.0),
+                        ),
+                      )
+                    ],
+                  );
+                });
+          } else {
+            _provider.changeGroupDetails(note.id, gId);
+            Navigator.of(context).pop();
+          }
         }
       },
       child: Row(

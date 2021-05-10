@@ -108,24 +108,7 @@ class _NotesDetailState extends State<NotesDetail> {
     Widget _colorPicker() {
       return DropdownButton<Color>(
         value: dropdownValue,
-        // icon: Container(
-        //   margin: EdgeInsets.all(6.5),
-        //   // color: Colors.black26,
-        //   decoration: BoxDecoration(
-        //     borderRadius: BorderRadius.all(
-        //       Radius.circular(14.0),
-        //     ),
-        //     color: Colors.black12,
-        //   ),
-        //   child: IconButton(
-        //     icon: Icon(
-        //       Icons.color_lens_rounded,
-        //       color: Colors.white,
-        //     ),
-        // onPressed: () {},
-        //   ),
-        // ),
-        // iconSize: 24,
+        iconSize: 0,
         elevation: 12,
         underline: Container(),
         onChanged: (Color newValue) {

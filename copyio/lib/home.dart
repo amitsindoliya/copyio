@@ -127,10 +127,10 @@ class _HomeState extends State<Home> {
               if (index < 5) {
                 // print(_groupIndex);
                 return NotesCard(
-                  _itemProvider.getGroup(_groupIndex)[index],
-                  MediaQuery.of(context).size.height * 0.38,
-                  false,
-                );
+                    _itemProvider.getGroup(_groupIndex)[index],
+                    MediaQuery.of(context).size.height * 0.38,
+                    false,
+                    _groupIndex);
               } else {
                 return ViewAll(_groupIndex);
               }

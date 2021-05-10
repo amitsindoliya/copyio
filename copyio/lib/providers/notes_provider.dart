@@ -77,6 +77,11 @@ class NotesProvider with ChangeNotifier {
     return notesGroup;
   }
 
+  void changeGroupDetails(String id, String gId) {
+    _notesList.firstWhere((element) => element.id == id).group.remove(gId);
+    notifyListeners();
+  }
+
   void addToGroup(Notes note) {
     notifyListeners();
   }

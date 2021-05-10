@@ -109,6 +109,7 @@ class ViewAllNotesScreen extends StatelessWidget {
                       _currentGroup[index],
                       MediaQuery.of(context).size.height * 0.25,
                       true,
+                      gID,
                     );
                   },
                   staggeredTileBuilder: (int index) => new StaggeredTile.count(
