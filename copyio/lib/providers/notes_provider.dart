@@ -82,7 +82,14 @@ class NotesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addToGroup(Notes note) {
+  void addToGroup(Notes note, String gId) {
+    if (_notesList
+        .firstWhere((element) => element.id == note.id)
+        .group
+        .contains(gId)) {
+    } else {
+      _notesList.firstWhere((element) => element.id == note.id).group.add(gId);
+    }
     notifyListeners();
   }
 

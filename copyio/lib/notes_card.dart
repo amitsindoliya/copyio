@@ -4,6 +4,7 @@ import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'notes_detail.dart';
+import 'dart:math';
 
 enum Department {
   treasury,
@@ -220,6 +221,60 @@ class ModalPins extends StatelessWidget {
             _provider.changeGroupDetails(note.id, gId);
             Navigator.of(context).pop();
           }
+        } else if (text == 'Add to Another Group') {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return SimpleDialog(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 28.0),
+                      child: Text(
+                        'Current list of groups available.',
+                        style: TextStyle(
+                            color: Colors.blueAccent[100], fontSize: 20.0),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      height: min(
+                          300.0, (_groupProvider.getGroups.length - 1) * 35.0),
+                      width: 300,
+                      child: ListView.builder(
+                          itemCount: _groupProvider.getGroups.length - 1,
+                          itemBuilder: (context, index) {
+                            return InkWell(
+                              onTap: () {
+                                _provider.addToGroup(
+                                    note,
+                                    _groupProvider
+                                        .getGroups[index + 1].groupId);
+                                Navigator.of(context).pop();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: Center(
+                                  child: Text(
+                                    _groupProvider
+                                        .getGroups[index + 1].groupName,
+                                    style: TextStyle(
+                                        fontSize: 20.0, color: Colors.grey),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'Back',
+                        style: TextStyle(color: Colors.red, fontSize: 14.0),
+                      ),
+                    )
+                  ],
+                );
+              });
         }
       },
       child: Row(
