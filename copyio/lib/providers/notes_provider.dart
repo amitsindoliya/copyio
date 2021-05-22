@@ -10,50 +10,50 @@ import 'dart:convert';
 
 class NotesProvider with ChangeNotifier {
   List<Notes> _notesList = [
-    Notes(
-        id: '10',
-        title: 'First Note',
-        body: 'Tried to create the first note in the app',
-        color: Colors.red[100],
-        group: ['1', '2'],
-        generatedTime: DateTime.now()),
-    Notes(
-        id: '11',
-        title: 'First Note123',
-        body:
-            'Tried to create the first note in the app ddddddd Tried to create the first note in the app ddddddd Tried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app ddddddd',
-        group: ['1', '3'],
-        generatedTime: DateTime.now()),
-    Notes(
-        id: '12',
-        title: 'First Note789',
-        body: 'Tried to create the first note in the app fsjdsd',
-        group: ['1', '3'],
-        generatedTime: DateTime.now()),
-    Notes(
-        id: '13',
-        title: 'First Note8',
-        body: 'Tried to create the first note in the app sfdnfds',
-        group: ['1', '2'],
-        generatedTime: DateTime.now()),
-    Notes(
-        id: '14',
-        title: 'First Note4',
-        body: 'Tried to create the first note in the app jbdjxb',
-        group: ['1', '3'],
-        generatedTime: DateTime.now()),
-    Notes(
-        id: '15',
-        title: 'First Note4',
-        body: 'Tried to create the first note in the app dfsbfbs',
-        group: ['1', '2'],
-        generatedTime: DateTime.now()),
-    Notes(
-        id: '16',
-        title: 'First Note55',
-        body: 'Tried to create the first note in the appefrf',
-        group: ['1', '3'],
-        generatedTime: DateTime.now())
+    // Notes(
+    //     id: '10',
+    //     title: 'First Note',
+    //     body: 'Tried to create the first note in the app',
+    //     color: Colors.red[100],
+    //     group: ['1', '2'],
+    //     generatedTime: DateTime.now()),
+    // Notes(
+    //     id: '11',
+    //     title: 'First Note123',
+    //     body:
+    //         'Tried to create the first note in the app ddddddd Tried to create the first note in the app ddddddd Tried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app dddddddTried to create the first note in the app ddddddd',
+    //     group: ['1', '3'],
+    //     generatedTime: DateTime.now()),
+    // Notes(
+    //     id: '12',
+    //     title: 'First Note789',
+    //     body: 'Tried to create the first note in the app fsjdsd',
+    //     group: ['1', '3'],
+    //     generatedTime: DateTime.now()),
+    // Notes(
+    //     id: '13',
+    //     title: 'First Note8',
+    //     body: 'Tried to create the first note in the app sfdnfds',
+    //     group: ['1', '2'],
+    //     generatedTime: DateTime.now()),
+    // Notes(
+    //     id: '14',
+    //     title: 'First Note4',
+    //     body: 'Tried to create the first note in the app jbdjxb',
+    //     group: ['1', '3'],
+    //     generatedTime: DateTime.now()),
+    // Notes(
+    //     id: '15',
+    //     title: 'First Note4',
+    //     body: 'Tried to create the first note in the app dfsbfbs',
+    //     group: ['1', '2'],
+    //     generatedTime: DateTime.now()),
+    // Notes(
+    //     id: '16',
+    //     title: 'First Note55',
+    //     body: 'Tried to create the first note in the appefrf',
+    //     group: ['1', '3'],
+    //     generatedTime: DateTime.now())
   ];
   int pinnedCompare(Notes a, Notes b) {
     if ((a.isPinned && b.isPinned) ||
@@ -64,6 +64,27 @@ class NotesProvider with ChangeNotifier {
     } else {
       return 1;
     }
+  }
+
+  Future<void> getDataFromServer() async {
+    var url =
+        Uri.https('notescove-6c068-default-rtdb.firebaseio.com', '/notes.json');
+    var response = await http.get(url);
+    var decodedServerData = jsonDecode(response.body);
+    // print(decodedServerData);
+    decodedServerData.forEach((key, value) {
+      Notes note = Notes(
+        id: key,
+        title: value['title'],
+        color: Color(value['color']),
+        body: value['body'],
+        generatedTime: DateTime.parse(value['generatedTime']),
+        group: value['group'].cast<String>(),
+        isPinned: value['pinned'],
+      );
+      _notesList.add(note);
+      notifyListeners();
+    });
   }
 
   List<Notes> get getNotes {
@@ -105,7 +126,7 @@ class NotesProvider with ChangeNotifier {
     Map<String, Object> noteMap = {
       'title': note.title,
       'body': note.body,
-      'color': note.color.toString(),
+      'color': note.color.value,
       'generatedTime': note.generatedTime.toString(),
       'pinned': note.isPinned,
       'group': note.group
@@ -128,9 +149,20 @@ class NotesProvider with ChangeNotifier {
     // print(_notesList);
   }
 
-  void changeById(Notes note) {
-    print('---' + note.isPinned.toString());
+  void changeById(Notes note) async {
+    // print('---' + note.isPinned.toString());
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/notes/${note.id}.json');
     int updateIndex = _notesList.indexWhere((oldnote) => oldnote.id == note.id);
+    Map<String, Object> updatedNoteMap = {
+      'title': note.title,
+      'body': note.body,
+      'color': note.color.value,
+      'generatedTime': note.generatedTime.toString(),
+      'pinned': note.isPinned,
+      'group': note.group
+    };
+    await http.patch(url, body: jsonEncode(updatedNoteMap));
     _notesList[updateIndex] = note;
 
     notifyListeners();
@@ -148,14 +180,22 @@ class NotesProvider with ChangeNotifier {
   }
 
   void pinNote(String id) {
+    var url = Uri.https(
+        'notescove-6c068-default-rtdb.firebaseio.com', '/notes/$id.json');
     int ind = _notesList.indexWhere((element) => element.id == id);
     _notesList[ind].isPinned = !_notesList[ind].isPinned;
-
+    http.patch(url,
+        body: jsonEncode({
+          'pinned': _notesList[ind].isPinned,
+        }));
     notifyListeners();
   }
 
   void deleteById(String id) {
+    var url = Uri.https(
+        'notescove-6c068-default-rtdb.firebaseio.com', '/notes/$id.json');
     _notesList.removeWhere((element) => element.id == id);
+    http.delete(url);
     // _notesList[ind].isPinned = !_notesList[ind].isPinned;
     notifyListeners();
   }

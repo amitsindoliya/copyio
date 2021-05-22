@@ -50,6 +50,12 @@ class _HomePageState extends State<HomePage> {
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
     Settings(),
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    Provider.of<NotesProvider>(context, listen: false).getDataFromServer();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
