@@ -35,8 +35,11 @@ class _NotesDetailState extends State<NotesDetail> {
     body: '',
     group: ['1'],
   );
-
+  bool _isLoading = false;
   void _saveForm() {
+    setState(() {
+      _isLoading = true;
+    });
     _fkey.currentState.save();
     if (_sampleNote.id == '') {
       _sampleNote = Notes(
@@ -47,7 +50,14 @@ class _NotesDetailState extends State<NotesDetail> {
         group: _sampleNote.group,
         color: _sampleNote.color,
       );
-      Provider.of<NotesProvider>(context, listen: false).setNotes(_sampleNote);
+      Provider.of<NotesProvider>(context, listen: false)
+          .setNotes(_sampleNote)
+          .then((value) {
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
+      });
     } else {
       _sampleNote = Notes(
         id: _sampleNote.id,
@@ -60,8 +70,8 @@ class _NotesDetailState extends State<NotesDetail> {
       );
       Provider.of<NotesProvider>(context, listen: false)
           .changeById(_sampleNote);
+      Navigator.of(context).pop();
     }
-    Navigator.of(context).pop();
   }
 
   bool _editFlag = true;
@@ -233,88 +243,94 @@ class _NotesDetailState extends State<NotesDetail> {
                         topRight: Radius.circular(32.0),
                       ),
                     ),
-                    child: Form(
-                      key: _fkey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextFormField(
-                            // controller: _titlecontroller,
-                            // title,
-                            // key: k1,
-                            maxLines: null,
-                            keyboardType: TextInputType.text,
-                            initialValue: _sampleNote.title,
-                            style: TextStyle(
-                              color: _sampleNote.color,
-                              fontSize: 26.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            decoration: InputDecoration(
-                              // border: InputBorder.none,
-                              hintText: 'Title',
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(
-                                fontWeight: FontWeight.normal,
-                                color: Colors.blueGrey,
-                              ),
-                            ),
-                            onSaved: (text) {
-                              _sampleNote = Notes(
-                                id: _sampleNote.id,
-                                title: text,
-                                body: _sampleNote.body,
-                                color: _sampleNote.color,
-                                group: _sampleNote.group,
-                                isPinned: _sampleNote.isPinned,
-                              );
-                            },
-                          ),
-                          _sampleNote.generatedTime != null
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      _sampleNote.generatedTime
-                                          .toString()
-                                          .split('.')[0],
-                                      style: TextStyle(color: Colors.grey),
-                                    ),
-                                  ],
-                                )
-                              : Text(''),
-                          // SizedBox(
-                          //   height: 5.0,
-                          // ),
-                          Expanded(
-                            child: TextFormField(
-                              initialValue: _sampleNote.body,
-                              keyboardType: TextInputType.multiline,
-                              maxLines: null,
-                              // autofocus: true,
-                              // controller: _bodyController,
-                              style: TextStyle(
-                                fontSize: 18.0,
-                              ),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                // hintText: 'body',
-                              ),
-                              onSaved: (text) {
-                                _sampleNote = Notes(
-                                  id: _sampleNote.id,
-                                  title: _sampleNote.title,
-                                  body: text,
-                                  color: _sampleNote.color,
-                                  group: _sampleNote.group,
-                                  isPinned: _sampleNote.isPinned,
-                                );
-                              },
-                            ),
+                    child: _isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(),
                           )
-                        ],
-                      ),
-                    ),
+                        : Form(
+                            key: _fkey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextFormField(
+                                  // controller: _titlecontroller,
+                                  // title,
+                                  // key: k1,
+                                  maxLines: null,
+                                  keyboardType: TextInputType.text,
+                                  initialValue: _sampleNote.title,
+                                  style: TextStyle(
+                                    color: _sampleNote.color,
+                                    fontSize: 26.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  decoration: InputDecoration(
+                                    // border: InputBorder.none,
+                                    hintText: 'Title',
+                                    border: InputBorder.none,
+                                    hintStyle: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.blueGrey,
+                                    ),
+                                  ),
+                                  onSaved: (text) {
+                                    _sampleNote = Notes(
+                                      id: _sampleNote.id,
+                                      title: text,
+                                      body: _sampleNote.body,
+                                      color: _sampleNote.color,
+                                      group: _sampleNote.group,
+                                      isPinned: _sampleNote.isPinned,
+                                    );
+                                  },
+                                ),
+                                _sampleNote.generatedTime != null
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            _sampleNote.generatedTime
+                                                .toString()
+                                                .split('.')[0],
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          ),
+                                        ],
+                                      )
+                                    : Text(''),
+                                // SizedBox(
+                                //   height: 5.0,
+                                // ),
+                                Expanded(
+                                  child: TextFormField(
+                                    initialValue: _sampleNote.body,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null,
+                                    // autofocus: true,
+                                    // controller: _bodyController,
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      // hintText: 'body',
+                                    ),
+                                    onSaved: (text) {
+                                      _sampleNote = Notes(
+                                        id: _sampleNote.id,
+                                        title: _sampleNote.title,
+                                        body: text,
+                                        color: _sampleNote.color,
+                                        group: _sampleNote.group,
+                                        isPinned: _sampleNote.isPinned,
+                                      );
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
                   ),
                 ),
               ],

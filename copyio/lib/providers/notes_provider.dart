@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:ffi';
+
 import 'package:copyio/models/groups.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class NotesProvider with ChangeNotifier {
   List<Notes> _notesList = [
@@ -93,11 +98,34 @@ class NotesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setNotes(Notes note) {
+  Future<void> setNotes(Notes note) async {
     print(note.group);
-    _notesList.insert(0, note);
-    // print(_notesList);
+    var url =
+        Uri.https('notescove-6c068-default-rtdb.firebaseio.com', '/notes.json');
+    Map<String, Object> noteMap = {
+      'title': note.title,
+      'body': note.body,
+      'color': note.color.toString(),
+      'generatedTime': note.generatedTime.toString(),
+      'pinned': note.isPinned,
+      'group': note.group
+    };
+    var response = await http.post(url, body: jsonEncode(noteMap));
+    var id = jsonDecode(response.body)['name'];
+    Notes newNote = Notes(
+        id: id.toString(),
+        title: note.title,
+        body: note.body,
+        color: note.color,
+        generatedTime: note.generatedTime,
+        isPinned: note.isPinned,
+        group: note.group);
+    _notesList.insert(0, newNote);
     notifyListeners();
+
+    // print(response);
+
+    // print(_notesList);
   }
 
   void changeById(Notes note) {
