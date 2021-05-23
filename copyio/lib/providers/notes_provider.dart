@@ -109,12 +109,19 @@ class NotesProvider with ChangeNotifier {
   }
 
   void addToGroup(Notes note, String gId) {
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/notes/${note.id}.json');
     if (_notesList
         .firstWhere((element) => element.id == note.id)
         .group
         .contains(gId)) {
     } else {
       _notesList.firstWhere((element) => element.id == note.id).group.add(gId);
+      http.patch(url,
+          body: jsonEncode({
+            'group':
+                _notesList.firstWhere((element) => element.id == note.id).group
+          }));
     }
     notifyListeners();
   }

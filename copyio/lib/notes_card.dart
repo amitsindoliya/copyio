@@ -265,6 +265,19 @@ class ModalPins extends StatelessWidget {
                             );
                           }),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onSubmitted: (value) {
+                          Provider.of<GroupProvider>(context, listen: false)
+                              .addGroup(value);
+                        },
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: 'Create a group',
+                        ),
+                      ),
+                    ),
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       child: Text(

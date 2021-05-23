@@ -1,4 +1,5 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:copyio/auth_page.dart';
 import 'package:copyio/home.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:copyio/notes_detail.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'CopyIO',
         theme: ThemeData(primaryColor: Colors.blueAccent[100]),
-        home: HomePage(),
+        home: AuthPage(),
       ),
     );
   }
@@ -54,6 +55,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     Provider.of<NotesProvider>(context, listen: false).getDataFromServer();
+    Provider.of<GroupProvider>(context, listen: false).setAndFetchGroup();
     super.initState();
   }
 
