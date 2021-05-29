@@ -15,14 +15,31 @@ class GroupProvider with ChangeNotifier {
       groupName: 'All Notes',
     ),
   ];
+  String authToken;
+  String authuserId;
+  void update(String token, String userId) {
+    authToken = token;
+    authuserId = userId;
+    if (token == null) {
+      _groupsList = [
+        Group(
+          groupId: '1',
+          groupName: 'All Notes',
+        ),
+      ];
+    }
+  }
 
   List<Group> get getGroups {
     return [..._groupsList];
   }
 
   void addGroup(String groupName) async {
-    var url = Uri.https(
-        'notescove-6c068-default-rtdb.firebaseio.com', '/groups.json');
+    var params = {
+      'auth': authToken,
+    };
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/$authuserId/groups.json', params);
     Map<String, Object> groupMap = {
       'groupName': groupName,
       'archived': 'no',
@@ -37,8 +54,11 @@ class GroupProvider with ChangeNotifier {
   }
 
   void setAndFetchGroup() async {
-    var url = Uri.https(
-        'notescove-6c068-default-rtdb.firebaseio.com', '/groups.json');
+    var params = {
+      'auth': authToken,
+    };
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/$authuserId/groups.json', params);
     var response = await http.get(url);
     var decodedGroupMapList = jsonDecode(response.body);
     decodedGroupMapList.forEach((key, value) {

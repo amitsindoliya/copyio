@@ -3,6 +3,7 @@ import 'package:copyio/auth_page.dart';
 import 'package:copyio/home.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:copyio/notes_detail.dart';
+import 'package:copyio/providers/auth.dart';
 import 'package:copyio/providers/groups_provider.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:copyio/viewall.dart';
@@ -17,21 +18,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => NotesProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => GroupProvider(),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'CopyIO',
-        theme: ThemeData(primaryColor: Colors.blueAccent[100]),
-        home: AuthPage(),
-      ),
-    );
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => Auth(),
+          ),
+          ChangeNotifierProxyProvider<Auth, NotesProvider>(
+            create: (ctx) => NotesProvider(),
+            update: (_, auth, prevNotes) =>
+                prevNotes..update(auth.token(), auth.userId),
+          ),
+          ChangeNotifierProxyProvider<Auth, GroupProvider>(
+            create: (_) => GroupProvider(),
+            update: (_, auth, prevGroup) =>
+                prevGroup..update(auth.token(), auth.userId),
+          ),
+        ],
+        child: Consumer<Auth>(
+          builder: (ctx, auth, _) => MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'CopyIO',
+            theme: ThemeData(primaryColor: Colors.blueAccent[100]),
+            home: auth.isAuth() ? HomePage() : AuthPage(),
+          ),
+        ));
   }
 }
 

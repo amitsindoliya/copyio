@@ -55,6 +55,17 @@ class NotesProvider with ChangeNotifier {
     //     group: ['1', '3'],
     //     generatedTime: DateTime.now())
   ];
+
+  String authToken;
+  String authuserId;
+  void update(String token, String userId) {
+    authToken = token;
+    authuserId = userId;
+    if (token == null) {
+      _notesList = [];
+    }
+  }
+
   int pinnedCompare(Notes a, Notes b) {
     if ((a.isPinned && b.isPinned) ||
         (a.isPinned == false && b.isPinned == false)) {
@@ -67,8 +78,11 @@ class NotesProvider with ChangeNotifier {
   }
 
   Future<void> getDataFromServer() async {
-    var url =
-        Uri.https('notescove-6c068-default-rtdb.firebaseio.com', '/notes.json');
+    var params = {
+      'auth': authToken,
+    };
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/$authuserId/notes.json', params);
     var response = await http.get(url);
     var decodedServerData = jsonDecode(response.body);
     // print(decodedServerData);
@@ -109,8 +123,11 @@ class NotesProvider with ChangeNotifier {
   }
 
   void addToGroup(Notes note, String gId) {
+    var params = {
+      'auth': authToken,
+    };
     var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
-        '/notes/${note.id}.json');
+        '/$authuserId/notes/${note.id}.json', params);
     if (_notesList
         .firstWhere((element) => element.id == note.id)
         .group
@@ -127,9 +144,11 @@ class NotesProvider with ChangeNotifier {
   }
 
   Future<void> setNotes(Notes note) async {
-    print(note.group);
-    var url =
-        Uri.https('notescove-6c068-default-rtdb.firebaseio.com', '/notes.json');
+    var params = {
+      'auth': authToken,
+    };
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/$authuserId/notes.json', params);
     Map<String, Object> noteMap = {
       'title': note.title,
       'body': note.body,
@@ -158,8 +177,11 @@ class NotesProvider with ChangeNotifier {
 
   void changeById(Notes note) async {
     // print('---' + note.isPinned.toString());
+    var params = {
+      'auth': authToken,
+    };
     var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
-        '/notes/${note.id}.json');
+        '/$authuserId/notes/${note.id}.json', params);
     int updateIndex = _notesList.indexWhere((oldnote) => oldnote.id == note.id);
     Map<String, Object> updatedNoteMap = {
       'title': note.title,
@@ -187,8 +209,11 @@ class NotesProvider with ChangeNotifier {
   }
 
   void pinNote(String id) {
-    var url = Uri.https(
-        'notescove-6c068-default-rtdb.firebaseio.com', '/notes/$id.json');
+    var params = {
+      'auth': authToken,
+    };
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/$authuserId/notes/$id.json', params);
     int ind = _notesList.indexWhere((element) => element.id == id);
     _notesList[ind].isPinned = !_notesList[ind].isPinned;
     http.patch(url,
@@ -199,8 +224,11 @@ class NotesProvider with ChangeNotifier {
   }
 
   void deleteById(String id) {
-    var url = Uri.https(
-        'notescove-6c068-default-rtdb.firebaseio.com', '/notes/$id.json');
+    var params = {
+      'auth': authToken,
+    };
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/$authuserId/notes/$id.json', params);
     _notesList.removeWhere((element) => element.id == id);
     http.delete(url);
     // _notesList[ind].isPinned = !_notesList[ind].isPinned;

@@ -1,4 +1,6 @@
+import 'package:copyio/providers/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Settings extends StatelessWidget {
   @override
@@ -56,10 +58,15 @@ class Settings extends StatelessWidget {
                 ),
               ),
               Card(
-                child: ListTile(
-                  // leading: Icon(Icons.album),
-                  title: Text('Sign Out'),
-                  subtitle: Text('Please don\'t'),
+                child: GestureDetector(
+                  onTap: () {
+                    Provider.of<Auth>(context, listen: false).logout();
+                  },
+                  child: ListTile(
+                    // leading: Icon(Icons.album),
+                    title: Text('Sign Out'),
+                    subtitle: Text('Please don\'t'),
+                  ),
                 ),
               ),
               Card(
