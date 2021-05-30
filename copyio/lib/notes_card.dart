@@ -211,8 +211,8 @@ class ModalPins extends StatefulWidget {
 class _ModalPinsState extends State<ModalPins> {
   var _iconColor = Colors.blueAccent[100];
 
-  var newGroupId;
-  String newVal;
+  // var newGroupId;
+  // String newVal;
   var _groupController = TextEditingController();
 
   @override
@@ -312,143 +312,10 @@ class _ModalPinsState extends State<ModalPins> {
           showDialog(
               context: context,
               builder: (BuildContext context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                  ),
-                  title: Text(
-                    'Available groups',
-                    style: TextStyle(fontSize: 24.0),
-                  ),
-                  content: Builder(builder: (context) {
-                    return Container(
-                      height: 300,
-                      child: Column(
-                        children: [
-                          Text(
-                            "Select one of group from dropdown or create a new group",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Center(
-                            child: Container(
-                              // padding: const EdgeInsets.all(0.0),
-                              child: DropdownButton<String>(
-                                value: newVal,
-                                //elevation: 5,
-                                style: TextStyle(color: Colors.black),
-
-                                items: _groupProvider.getGroups
-                                    .map<DropdownMenuItem<String>>(
-                                        (Group value) {
-                                  print(value.groupName);
-                                  var itList = DropdownMenuItem<String>(
-                                    value: value.groupId,
-                                    child: Text(value.groupName),
-                                  );
-
-                                  return itList;
-                                }).toList(),
-                                hint: Text(
-                                  "Select a group",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                                onChanged: (String value) {
-                                  var val = _groupProvider.getGroups
-                                      .firstWhere(
-                                          (element) => element.groupId == value)
-                                      .groupName;
-                                  print(val + '888888888888');
-                                  setState(() {
-                                    newGroupId = value;
-                                    newVal = val;
-                                  });
-                                  print(newGroupId);
-                                },
-                              ),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 200,
-                                child: TextField(
-                                  controller: _groupController,
-                                  // onSubmitted: (value) {},
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    labelText: 'Create a group',
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                  icon: Icon(Icons.check),
-                                  onPressed: () {
-                                    Provider.of<GroupProvider>(context,
-                                            listen: false)
-                                        .addGroup(_groupController.text);
-                                  })
-                            ],
-                          ),
-                          Container(
-                            width: 150,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                _provider.addToGroup(widget.note, newGroupId);
-
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                'Confirm',
-                                style: TextStyle(fontSize: 18.0),
-                              ),
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                    if (states.contains(MaterialState.pressed))
-                                      return Color(0xFF0066FF);
-                                    return Color(0xFF0066FF);
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 150,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                    fontSize: 18.0, color: Colors.grey),
-                              ),
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                    if (states.contains(MaterialState.pressed))
-                                      return Color(0xFFEDF1F7);
-                                    return Color(0xFFEDF1F7);
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                );
+                return GroupAlert(
+                    groupProvider: _groupProvider,
+                    provider: _provider,
+                    widget: widget);
               });
         }
       },
@@ -473,6 +340,179 @@ class _ModalPinsState extends State<ModalPins> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class GroupAlert extends StatefulWidget {
+  GroupAlert({
+    Key key,
+    // @required this.newVal,
+    @required GroupProvider groupProvider,
+    // @required this.newGroupId,
+    // @required TextEditingController groupController,
+    @required NotesProvider provider,
+    @required this.widget,
+  })  : _groupProvider = groupProvider,
+        _provider = provider,
+        super(key: key);
+
+  final GroupProvider _groupProvider;
+  // final newGroupId;
+  // final TextEditingController _groupController;
+  final NotesProvider _provider;
+  final ModalPins widget;
+
+  @override
+  _GroupAlertState createState() => _GroupAlertState();
+}
+
+class _GroupAlertState extends State<GroupAlert> {
+  var newGroupId;
+  String newVal;
+  var _groupController = TextEditingController();
+  var _isloading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+      ),
+      title: Text(
+        'Available groups',
+        style: TextStyle(fontSize: 24.0),
+      ),
+      content: Builder(builder: (context) {
+        return Container(
+          height: 300,
+          child: Column(
+            children: [
+              Text(
+                "Select one of group from dropdown or create a new group",
+                style: TextStyle(color: Colors.grey),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Center(
+                child: Container(
+                  // padding: const EdgeInsets.all(0.0),
+                  child: DropdownButton<String>(
+                    value: newVal,
+                    //elevation: 5,
+                    style: TextStyle(color: Colors.black),
+
+                    items: widget._groupProvider.getGroups
+                        .map<DropdownMenuItem<String>>((Group value) {
+                      var itList = DropdownMenuItem<String>(
+                        value: value.groupId,
+                        child: Text(value.groupName),
+                      );
+
+                      return itList;
+                    }).toList(),
+                    hint: Text(
+                      "Select a group",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    onChanged: (String value) {
+                      setState(() {
+                        newGroupId = value;
+                        newVal = value;
+                      });
+                      print(newGroupId);
+                    },
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 200,
+                    child: TextField(
+                      controller: _groupController,
+                      // onSubmitted: (value) {},
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: 'Create a group',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                      icon: Icon(Icons.check),
+                      onPressed: () async {
+                        setState(() {
+                          _isloading = true;
+                        });
+
+                        var value = await Provider.of<GroupProvider>(context,
+                                listen: false)
+                            .addGroup(_groupController.text);
+                        newGroupId = value;
+                        setState(() {
+                          _isloading = false;
+                        });
+                      })
+                ],
+              ),
+              _isloading
+                  ? CircularProgressIndicator()
+                  : Container(
+                      width: 150,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          widget._provider
+                              .addToGroup(widget.widget.note, newGroupId);
+
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.pressed))
+                                return Color(0xFF0066FF);
+                              return Color(0xFF0066FF);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+              Container(
+                width: 150,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(fontSize: 18.0, color: Colors.grey),
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.pressed))
+                          return Color(0xFFEDF1F7);
+                        return Color(0xFFEDF1F7);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

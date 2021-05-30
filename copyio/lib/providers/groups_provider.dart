@@ -34,7 +34,7 @@ class GroupProvider with ChangeNotifier {
     return [..._groupsList];
   }
 
-  void addGroup(String groupName) async {
+  Future<String> addGroup(String groupName) async {
     var params = {
       'auth': authToken,
     };
@@ -51,6 +51,7 @@ class GroupProvider with ChangeNotifier {
         groupId: jsonDecode(response.body)['name'].toString(),
         groupName: groupName));
     notifyListeners();
+    return jsonDecode(response.body)['name'].toString();
   }
 
   void setAndFetchGroup() async {
