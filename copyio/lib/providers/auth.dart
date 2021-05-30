@@ -28,14 +28,26 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  Future<void> emailVerification(token) async {
+    const params = {
+      'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
+    };
+    var verifyEmail = Uri.https(
+        'identitytoolkit.googleapis.com', '/v1/accounts:sendOobCode', params);
+
+    var requestVerification = {"requestType": "VERIFY_EMAIL", "idToken": token};
+
+    var res =
+        await http.post(verifyEmail, body: jsonEncode(requestVerification));
+    print(res.body);
+  }
+
   Future<void> signUp(email, password) async {
     const params = {
       'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
     };
     var signupUri = Uri.https(
         'identitytoolkit.googleapis.com', '/v1/accounts:signUp', params);
-    var verifyEmail = Uri.https(
-        'identitytoolkit.googleapis.com', '/v1/accounts:sendOobCode', params);
 
     var requestData = {
       'email': email,
@@ -44,21 +56,16 @@ class Auth with ChangeNotifier {
     };
 
     var response = await http.post(signupUri, body: jsonEncode(requestData));
-    var requestVerification = {
-      "requestType": "VERIFY_EMAIL",
-      "idToken": jsonDecode(response.body)['idToken']
-    };
+    var initialToken = jsonDecode(response.body)['idToken'];
 
-    var verificationResponse =
-        await http.post(verifyEmail, body: jsonEncode(requestVerification));
-    print(verificationResponse.body);
-
+    // print(verificationResponse.body);
+    emailVerification(initialToken);
     // print();
 
     notifyListeners();
   }
 
-  Future<bool> logIn(email, password) async {
+  Future<List> logIn(email, password) async {
     const params = {
       'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
     };
@@ -88,11 +95,11 @@ class Auth with ChangeNotifier {
         jsonDecode(confirmEmailResponse.body)['users'][0]['emailVerified'];
     if (emailVerified == false) {
       logout();
-      return false;
+      return [false, reponseDecodedData['idToken']];
     }
 
     notifyListeners();
-    return true;
+    return [true];
   }
 
   void logout() {

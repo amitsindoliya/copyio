@@ -45,31 +45,58 @@ class _AuthPageState extends State<AuthPage> {
         _authData['email'],
         _authData['password'],
       );
-      if (verifiedUser == false) {
+      if (verifiedUser[0] == false) {
         showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
                   // title: Text('Please verify your email'),
                   content: Container(
-                    height: 300,
+                    height: 350,
+                    width: 300,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(Icons.close),
-                        Text(
-                          "OOPS!! Unverified Email",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            // Text(
+                            //   "Unverified Email",
+                            //   // style: TextStyle(fontWeight: FontWeight.bold),
+                            // ),
+                            IconButton(
+                              icon: Icon(Icons.close),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                          ],
                         ),
-                        Image.asset("assets/images/email-133-128 (1).png"),
+                        Container(
+                            height: 180,
+                            width: 200,
+                            child: Image.asset("assets/images/Email_PNG.png")),
+                        SizedBox(
+                          height: 5,
+                        ),
                         Text(
-                          "please verify your email using the link in your mail",
+                          "OOPS!!!",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 22.0),
+                        ),
+                        Text(
+                          "Looks like your email isn't verified",
                           style: TextStyle(color: Colors.grey),
+                        ),
+                        SizedBox(
+                          height: 10,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             ElevatedButton(
-                                onPressed: () => Navigator.of(context).pop(),
+                                onPressed: () async {
+                                  var res = await Provider.of<Auth>(context,
+                                          listen: false)
+                                      .emailVerification(verifiedUser[1]);
+                                },
                                 child: Text('Resend')),
                           ],
                         )
@@ -105,36 +132,37 @@ class _AuthPageState extends State<AuthPage> {
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              ClipPath(
-                clipper: TopClipPath(),
+              Positioned(
+                  // top: 100,
+                  child: ClipPath(
+                clipper: MidCustomClipPath(),
                 child: Container(
-                  height: 180,
+                  // height: 350,
                   decoration: BoxDecoration(
                       gradient: LinearGradient(colors: [
                     Color(0xFF787FF6),
                     Color(0xFF4ADEDE),
                   ])),
                 ),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    Positioned(
-                        child: ClipPath(
-                      clipper: MidCustomClipPath(),
-                      child: Container(
-                        height: 350,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: [
-                          Color(0xFF787FF6),
-                          Color(0xFF4ADEDE),
-                        ])),
-                      ),
-                    )),
-                    Form(
+              )),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipPath(
+                    clipper: TopClipPath(),
+                    child: Container(
+                      height: 180,
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                        Color(0xFF787FF6),
+                        Color(0xFF4ADEDE),
+                      ])),
+                    ),
+                  ),
+                  Expanded(
+                    child: Form(
                       // autovalidateMode: AutovalidateMode.always,
                       key: _formkey,
                       child: Container(
@@ -177,7 +205,75 @@ class _AuthPageState extends State<AuthPage> {
                               ),
                             ),
                             SizedBox(
-                              height: 60,
+                              height: 20,
+                            ),
+                            Row(
+                              // mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (_currPage == Page.Login) {
+                                        _currPage = Page.SignUp;
+                                      } else {
+                                        _currPage = Page.Login;
+                                      }
+                                    });
+                                  },
+                                  child: Container(
+                                      decoration: _currPage == Page.Login
+                                          ? BoxDecoration(
+                                              border: Border(
+                                                  bottom: BorderSide(
+                                                      width: 1,
+                                                      color: Theme.of(context)
+                                                          .primaryColor)))
+                                          : BoxDecoration(),
+                                      padding: EdgeInsets.all(5.0),
+                                      child: Text(
+                                        'Login',
+                                        style: TextStyle(
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.w300,
+                                            color: _currPage == Page.Login
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.grey),
+                                      )),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (_currPage == Page.Login) {
+                                        _currPage = Page.SignUp;
+                                      } else {
+                                        _currPage = Page.Login;
+                                      }
+                                    });
+                                  },
+                                  child: Container(
+                                      decoration: _currPage != Page.Login
+                                          ? BoxDecoration(
+                                              border: Border(
+                                                  bottom: BorderSide(
+                                                      width: 1,
+                                                      color: Theme.of(context)
+                                                          .primaryColor)))
+                                          : BoxDecoration(),
+                                      padding: EdgeInsets.all(5.0),
+                                      child: Text(
+                                        'Register',
+                                        style: TextStyle(
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.w300,
+                                            color: _currPage != Page.Login
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.grey),
+                                      )),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 20,
                             ),
                             Theme(
                               data: Theme.of(context).copyWith(
@@ -311,81 +407,12 @@ class _AuthPageState extends State<AuthPage> {
                                       ),
                                     ),
                                   ),
-                            SizedBox(
-                              height: 40,
-                            ),
-                            Center(
-                                child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (_currPage == Page.Login) {
-                                        _currPage = Page.SignUp;
-                                      } else {
-                                        _currPage = Page.Login;
-                                      }
-                                    });
-                                  },
-                                  child: Container(
-                                      decoration: _currPage == Page.Login
-                                          ? BoxDecoration(
-                                              border: Border(
-                                                  bottom: BorderSide(
-                                                      width: 1,
-                                                      color: Theme.of(context)
-                                                          .primaryColor)))
-                                          : BoxDecoration(),
-                                      padding: EdgeInsets.all(5.0),
-                                      child: Text(
-                                        'Login',
-                                        style: TextStyle(
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.w300,
-                                            color: _currPage == Page.Login
-                                                ? Theme.of(context).primaryColor
-                                                : Colors.grey),
-                                      )),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      if (_currPage == Page.Login) {
-                                        _currPage = Page.SignUp;
-                                      } else {
-                                        _currPage = Page.Login;
-                                      }
-                                    });
-                                  },
-                                  child: Container(
-                                      decoration: _currPage != Page.Login
-                                          ? BoxDecoration(
-                                              border: Border(
-                                                  bottom: BorderSide(
-                                                      width: 1,
-                                                      color: Theme.of(context)
-                                                          .primaryColor)))
-                                          : BoxDecoration(),
-                                      padding: EdgeInsets.all(5.0),
-                                      child: Text(
-                                        'Register',
-                                        style: TextStyle(
-                                            fontSize: 20.0,
-                                            fontWeight: FontWeight.w300,
-                                            color: _currPage != Page.Login
-                                                ? Theme.of(context).primaryColor
-                                                : Colors.grey),
-                                      )),
-                                ),
-                              ],
-                            )),
                           ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -401,10 +428,19 @@ class MidCustomClipPath extends CustomClipper<Path> {
     // TODO: implement getClip
     Path path = Path();
     print(size.height);
-    path.moveTo(size.width, 0);
-    path.lineTo(size.width / 2, size.height / 1.8);
+    path.moveTo(size.width, size.height * 0.85);
+    // path.lineTo(size.width / 2, size.height / 1.3);
     // path.quadraticBezierTo(50, 100, 250, 300);
-    path.lineTo(size.width, size.height + 80);
+    // var fstartpoint = Offset(dx, dy);
+    // var flastpoint = Offset(dx, dy);
+    path.quadraticBezierTo(size.width / 1.4, size.height * 0.95, size.width / 2,
+        size.height * 0.9);
+    path.quadraticBezierTo(
+        size.width / 6, size.height * 0.82, 0, size.height * 0.93);
+    path.lineTo(0, size.height * 0.85);
+    path.lineTo(0, size.height);
+    path.lineTo(size.width, size.height);
+    path.close();
     // path.arcToPoint(Offset(400, 100), radius: Radius.circular(15));
     // throw UnimplementedError();
     return path;
@@ -425,7 +461,15 @@ class TopClipPath extends CustomClipper<Path> {
     Path path = Path();
     print(size.height);
     path.lineTo(0, size.height);
-    path.lineTo(75, 50);
+    path.quadraticBezierTo(
+        size.width / 4.4, size.height, size.width / 2.1, size.height * 0.7);
+    path.quadraticBezierTo(
+        size.width / 1.2, size.height * 0.26, size.width, size.height * 0.60);
+    path.lineTo(size.width, size.height * 0.7);
+
+    path.lineTo(size.width, 0);
+    path.lineTo(0, 0);
+    path.close();
     // path.arcToPoint(Offset(400, 100), radius: Radius.circular(15));
     // throw UnimplementedError();
     return path;

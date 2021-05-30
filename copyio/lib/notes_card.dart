@@ -3,6 +3,7 @@ import 'package:copyio/providers/groups_provider.dart';
 import 'package:copyio/providers/notes_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'models/groups.dart';
 import 'notes_detail.dart';
 import 'dart:math';
 
@@ -105,16 +106,59 @@ class NotesCard extends StatelessWidget {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return SimpleDialog(
-                  children: [
-                    ModalPins('Pin', Icons.push_pin_outlined, notes, gId),
-                    ModalPins('Delete', Icons.delete_outline, notes, gId),
-                    ModalPins('Add to Another Group', Icons.add, notes, gId),
-                    ModalPins(
-                        'Remove from Current Group', Icons.remove, notes, gId),
-                    ModalPins('Change color', Icons.ac_unit, notes, gId),
-                  ],
-                );
+                return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                    ),
+                    title: Text(
+                      'Note Settings',
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                    content: Builder(
+                      builder: (context) {
+                        return Container(
+                          height: 200,
+                          // width: 400,
+                          child: Column(
+                            children: [
+                              ModalPins(
+                                  'Pin', Icons.push_pin_outlined, notes, gId),
+                              ModalPins(
+                                  'Delete', Icons.delete_outline, notes, gId),
+                              ModalPins('Add to Another Group', Icons.add,
+                                  notes, gId),
+                              ModalPins('Remove from Group', Icons.remove,
+                                  notes, gId),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                width: 150,
+                                child: ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.grey),
+                                  ),
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        if (states
+                                            .contains(MaterialState.pressed))
+                                          return Color(0xFFEDF1F7);
+                                        return Color(0xFFEDF1F7);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ));
               },
             );
 
@@ -153,139 +197,257 @@ class NotesCard extends StatelessWidget {
   }
 }
 
-class ModalPins extends StatelessWidget {
+class ModalPins extends StatefulWidget {
   String text;
   IconData icons;
   Notes note;
   final String gId;
   ModalPins(this.text, this.icons, this.note, this.gId);
+
+  @override
+  _ModalPinsState createState() => _ModalPinsState();
+}
+
+class _ModalPinsState extends State<ModalPins> {
   var _iconColor = Colors.blueAccent[100];
+
+  var newGroupId;
+  String newVal;
+  var _groupController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     var _provider = Provider.of<NotesProvider>(context);
     var _groupProvider = Provider.of<GroupProvider>(context);
-    if (text == 'Delete') {
+    if (widget.text == 'Delete') {
       _iconColor = Colors.blueAccent[100];
-    } else if (text == 'Pin') {
-      if (note.isPinned) {
-        icons = Icons.push_pin;
+    } else if (widget.text == 'Pin') {
+      if (widget.note.isPinned) {
+        widget.icons = Icons.push_pin;
       } else {
-        icons = Icons.push_pin_outlined;
+        widget.icons = Icons.push_pin_outlined;
       }
     }
     return InkWell(
       onTap: () {
-        if (text == 'Pin') {
-          _provider.pinNote(note.id);
+        if (widget.text == 'Pin') {
+          _provider.pinNote(widget.note.id);
           // print(note.isPinned);
-        } else if (text == 'Delete') {
-          _provider.deleteById(note.id);
+        } else if (widget.text == 'Delete') {
+          _provider.deleteById(widget.note.id);
           Navigator.of(context).pop();
-        } else if (text == 'Remove from Current Group') {
-          if (gId == '1') {
+        } else if (widget.text == 'Remove from Current Group') {
+          if (widget.gId == '1') {
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return SimpleDialog(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 28.0),
-                        child: Text(
-                          'This Action will delete the note. Are you Sure?',
-                          style: TextStyle(color: Colors.grey, fontSize: 20.0),
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                    title: Text(
+                      'Delete note',
+                      style: TextStyle(fontSize: 24.0),
+                    ),
+                    content: Padding(
+                      padding: EdgeInsets.all(0.0),
+                      child: Text(
+                        'This action will remove the note. Are you Sure? You won\'t be able to access the note anymore',
+                        style: TextStyle(color: Colors.grey, fontSize: 15.0),
+                      ),
+                    ),
+                    actions: [
+                      Container(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(
+                            'Cancel',
+                            style:
+                                TextStyle(fontSize: 18.0, color: Colors.grey),
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed))
+                                  return Color(0xFFEDF1F7);
+                                return Color(0xFFEDF1F7);
+                              },
+                            ),
+                          ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          _provider.deleteById(note.id);
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(
-                          'Yes',
-                          style: TextStyle(color: Colors.green, fontSize: 18.0),
+                      Container(
+                        width: 150,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            _provider.deleteById(widget.note.id);
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(
+                            'Confirm',
+                            style: TextStyle(fontSize: 18.0),
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed))
+                                  return Color(0xFF0066FF);
+                                return Color(0xFF0066FF);
+                              },
+                            ),
+                          ),
                         ),
                       ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: Text(
-                          'No',
-                          style: TextStyle(color: Colors.red, fontSize: 18.0),
-                        ),
-                      )
                     ],
                   );
                 });
           } else {
-            _provider.changeGroupDetails(note.id, gId);
+            _provider.changeGroupDetails(widget.note.id, widget.gId);
             Navigator.of(context).pop();
           }
-        } else if (text == 'Add to Another Group') {
+        } else if (widget.text == 'Add to Another Group') {
           showDialog(
               context: context,
               builder: (BuildContext context) {
-                return SimpleDialog(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 28.0),
-                      child: Text(
-                        'Current list of groups available.',
-                        style: TextStyle(
-                            color: Colors.blueAccent[100], fontSize: 20.0),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                      height: min(
-                          300.0, (_groupProvider.getGroups.length - 1) * 35.0),
-                      width: 300,
-                      child: ListView.builder(
-                          itemCount: _groupProvider.getGroups.length - 1,
-                          itemBuilder: (context, index) {
-                            return InkWell(
-                              onTap: () {
-                                _provider.addToGroup(
-                                    note,
-                                    _groupProvider
-                                        .getGroups[index + 1].groupId);
-                                Navigator.of(context).pop();
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(3.0),
-                                child: Center(
-                                  child: Text(
-                                    _groupProvider
-                                        .getGroups[index + 1].groupName,
-                                    style: TextStyle(
-                                        fontSize: 20.0, color: Colors.grey),
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                  ),
+                  title: Text(
+                    'Available groups',
+                    style: TextStyle(fontSize: 24.0),
+                  ),
+                  content: Builder(builder: (context) {
+                    return Container(
+                      height: 300,
+                      child: Column(
+                        children: [
+                          Text(
+                            "Select one of group from dropdown or create a new group",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          Center(
+                            child: Container(
+                              // padding: const EdgeInsets.all(0.0),
+                              child: DropdownButton<String>(
+                                value: newVal,
+                                //elevation: 5,
+                                style: TextStyle(color: Colors.black),
+
+                                items: _groupProvider.getGroups
+                                    .map<DropdownMenuItem<String>>(
+                                        (Group value) {
+                                  print(value.groupName);
+                                  var itList = DropdownMenuItem<String>(
+                                    value: value.groupId,
+                                    child: Text(value.groupName),
+                                  );
+
+                                  return itList;
+                                }).toList(),
+                                hint: Text(
+                                  "Select a group",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                onChanged: (String value) {
+                                  var val = _groupProvider.getGroups
+                                      .firstWhere(
+                                          (element) => element.groupId == value)
+                                      .groupName;
+                                  print(val + '888888888888');
+                                  setState(() {
+                                    newGroupId = value;
+                                    newVal = val;
+                                  });
+                                  print(newGroupId);
+                                },
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 200,
+                                child: TextField(
+                                  controller: _groupController,
+                                  // onSubmitted: (value) {},
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    labelText: 'Create a group',
                                   ),
                                 ),
                               ),
-                            );
-                          }),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        onSubmitted: (value) {
-                          Provider.of<GroupProvider>(context, listen: false)
-                              .addGroup(value);
-                        },
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          labelText: 'Create a group',
-                        ),
+                              IconButton(
+                                  icon: Icon(Icons.check),
+                                  onPressed: () {
+                                    Provider.of<GroupProvider>(context,
+                                            listen: false)
+                                        .addGroup(_groupController.text);
+                                  })
+                            ],
+                          ),
+                          Container(
+                            width: 150,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _provider.addToGroup(widget.note, newGroupId);
+
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'Confirm',
+                                style: TextStyle(fontSize: 18.0),
+                              ),
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
+                                    if (states.contains(MaterialState.pressed))
+                                      return Color(0xFF0066FF);
+                                    return Color(0xFF0066FF);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 150,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    fontSize: 18.0, color: Colors.grey),
+                              ),
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
+                                    if (states.contains(MaterialState.pressed))
+                                      return Color(0xFFEDF1F7);
+                                    return Color(0xFFEDF1F7);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        'Back',
-                        style: TextStyle(color: Colors.red, fontSize: 14.0),
-                      ),
-                    )
-                  ],
+                    );
+                  }),
                 );
               });
         }
@@ -296,7 +458,7 @@ class ModalPins extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
             child: Icon(
-              icons,
+              widget.icons,
               color: _iconColor,
             ),
           ),
@@ -304,7 +466,7 @@ class ModalPins extends StatelessWidget {
             // width: double.infinity - 200,
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
             child: Text(
-              text,
+              widget.text,
               style: TextStyle(fontSize: 20.0, color: Colors.black54),
             ),
             // decoration: BoxDecoration(border: Border.all(width: 0)),
