@@ -3,6 +3,7 @@ import 'package:copyio/auth_page.dart';
 import 'package:copyio/home.dart';
 import 'package:copyio/models/notes.dart';
 import 'package:copyio/notes_detail.dart';
+import 'package:copyio/profile.dart';
 import 'package:copyio/providers/auth.dart';
 import 'package:copyio/providers/groups_provider.dart';
 import 'package:copyio/providers/notes_provider.dart';
@@ -66,8 +67,7 @@ class _HomePageState extends State<HomePage> {
     Home(),
     Text('Search Page',
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Profile Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    Profile(),
     Settings(),
   ];
   @override
