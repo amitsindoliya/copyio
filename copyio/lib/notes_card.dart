@@ -236,7 +236,7 @@ class _ModalPinsState extends State<ModalPins> {
         } else if (widget.text == 'Delete') {
           _provider.deleteById(widget.note.id);
           Navigator.of(context).pop();
-        } else if (widget.text == 'Remove from Current Group') {
+        } else if (widget.text == 'Remove from Group') {
           if (widget.gId == '1') {
             showDialog(
                 context: context,
