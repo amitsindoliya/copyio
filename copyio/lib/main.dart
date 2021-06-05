@@ -38,7 +38,17 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'CopyIO',
             theme: ThemeData(primaryColor: Colors.blueAccent[100]),
-            home: auth.isAuth() ? HomePage() : AuthPage(),
+            home: auth.isAuth()
+                ? HomePage()
+                : FutureBuilder(
+                    future: auth.autoLogin(),
+                    builder: (ctx, snap) {
+                      if (snap.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snap.data == false) {
+                        return AuthPage();
+                      }
+                    }),
           ),
         ));
   }

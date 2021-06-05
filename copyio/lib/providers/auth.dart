@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
   String _userId;
+  String _refreshToken;
+  Timer authTimer;
 
   bool isAuth() {
     return token() != null;
@@ -82,6 +86,7 @@ class Auth with ChangeNotifier {
     _expiryDate = DateTime.now()
         .add(Duration(seconds: int.parse(reponseDecodedData['expiresIn'])));
     _userId = reponseDecodedData['localId'];
+    _refreshToken = reponseDecodedData['refreshToken'];
     // print(_token);
     var confirmEmail = Uri.https(
         'identitytoolkit.googleapis.com', '/v1/accounts:lookup', params);
@@ -99,13 +104,89 @@ class Auth with ChangeNotifier {
     }
 
     notifyListeners();
+    _startTimer();
+    var pref = await SharedPreferences.getInstance();
+    var loginData = json.encode({
+      'token': _token,
+      'refreshToken': _refreshToken,
+      'localId': _userId,
+      'expiryDate': _expiryDate.toIso8601String()
+    });
+    pref.setString('loginData', loginData);
     return [true];
   }
 
-  void logout() {
+  Future<bool> autoLogin() async {
+    var pref = await SharedPreferences.getInstance();
+    // print('///")');
+    // print('****' + pref.containsKey('loginData').toString());
+    if (!pref.containsKey('loginData')) {
+      return false;
+    }
+
+    var savedLoginData = pref.getString('loginData');
+    var savedDecodedLoginData = json.decode(savedLoginData);
+    _token = savedDecodedLoginData['token'];
+    _expiryDate = DateTime.parse(savedDecodedLoginData['expiryDate']);
+    _userId = savedDecodedLoginData['localId'];
+    _refreshToken = savedDecodedLoginData['refreshToken'];
+
+    if (_expiryDate.isBefore(DateTime.now())) {
+      await getNewToken();
+    } else {
+      _startTimer();
+    }
+    notifyListeners();
+    return true;
+  }
+
+  Future<void> getNewToken() async {
+    const params = {
+      'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
+    };
+    var updatedTokenUri =
+        Uri.https('securetoken.googleapis.com', '/v1/token', params);
+
+    var requestData = {
+      'grant_type': 'refresh_token',
+      'refresh_token': _refreshToken,
+    };
+
+    var updatedResponse = await http.post(
+      updatedTokenUri,
+      body: jsonEncode(requestData),
+    );
+    var updatedDecodedResponse = json.decode(updatedResponse.body);
+    _token = updatedDecodedResponse['id_token'];
+    _expiryDate = DateTime.now().add(
+        Duration(seconds: int.parse(updatedDecodedResponse['expires_in'])));
+    _userId = updatedDecodedResponse['user_id'];
+    _refreshToken = updatedDecodedResponse['refresh_token'];
+    // notifyListeners();
+    _startTimer();
+  }
+
+  void logout() async {
     _expiryDate = null;
     _token = null;
     _userId = null;
+    authTimer = null;
+    var pref = await SharedPreferences.getInstance();
+    pref.remove('loginData');
     notifyListeners();
+  }
+
+  void _startTimer() {
+    // print('timer in');
+    if (authTimer != null) {
+      authTimer.cancel();
+    }
+    var timerTime = _expiryDate.difference(DateTime.now()).inSeconds;
+    authTimer = Timer(Duration(seconds: timerTime), () async {
+      // print('timer out');
+      await getNewToken();
+
+      notifyListeners();
+    });
   }
 }
