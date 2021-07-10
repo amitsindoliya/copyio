@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -32,9 +33,14 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String readFileSync() {
+    String contents = new File('../token_data.txt').readAsStringSync();
+    return contents;
+  }
+
   Future<void> emailVerification(token) async {
-    const params = {
-      'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
+    var params = {
+      'key': readFileSync(),
     };
     var verifyEmail = Uri.https(
         'identitytoolkit.googleapis.com', '/v1/accounts:sendOobCode', params);
@@ -47,8 +53,8 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> signUp(email, password) async {
-    const params = {
-      'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
+    var params = {
+      'key': readFileSync(),
     };
     var signupUri = Uri.https(
         'identitytoolkit.googleapis.com', '/v1/accounts:signUp', params);
@@ -61,7 +67,7 @@ class Auth with ChangeNotifier {
 
     var response = await http.post(signupUri, body: jsonEncode(requestData));
     var initialToken = jsonDecode(response.body)['idToken'];
-
+    createProfile(email, initialToken, jsonDecode(response.body)['localId']);
     // print(verificationResponse.body);
     emailVerification(initialToken);
     // print();
@@ -70,8 +76,8 @@ class Auth with ChangeNotifier {
   }
 
   Future<List> logIn(email, password) async {
-    const params = {
-      'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
+    var params = {
+      'key': readFileSync(),
     };
     var loginURI = Uri.https('identitytoolkit.googleapis.com',
         '/v1/accounts:signInWithPassword', params);
@@ -100,6 +106,7 @@ class Auth with ChangeNotifier {
         jsonDecode(confirmEmailResponse.body)['users'][0]['emailVerified'];
     if (emailVerified == false) {
       logout();
+
       return [false, reponseDecodedData['idToken']];
     }
 
@@ -114,6 +121,19 @@ class Auth with ChangeNotifier {
     });
     pref.setString('loginData', loginData);
     return [true];
+  }
+
+  Future<void> createProfile(email, initialToken, uid) async {
+    // profile.email = email;
+    var params = {
+      'auth': initialToken,
+    };
+    var data = {'email': email};
+    var url = Uri.https('notescove-6c068-default-rtdb.firebaseio.com',
+        '/$uid/profile.json', params);
+    var response = await http.put(url, body: json.encode(data));
+    print(response.body);
+    notifyListeners();
   }
 
   Future<bool> autoLogin() async {
@@ -141,8 +161,8 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> getNewToken() async {
-    const params = {
-      'key': 'AIzaSyC8rAgo-DmI86l5AsaqC6zZGcLtilKLOJo',
+    var params = {
+      'key': readFileSync(),
     };
     var updatedTokenUri =
         Uri.https('securetoken.googleapis.com', '/v1/token', params);

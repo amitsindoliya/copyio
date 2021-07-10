@@ -10,6 +10,8 @@ import 'package:copyio/providers/notes_provider.dart';
 import 'package:copyio/viewall.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'activity.dart';
+import 'models/Profile.dart';
 import 'notes_card.dart';
 import 'settings.dart';
 
@@ -32,6 +34,11 @@ class MyApp extends StatelessWidget {
             create: (_) => GroupProvider(),
             update: (_, auth, prevGroup) =>
                 prevGroup..update(auth.token(), auth.userId),
+          ),
+          ChangeNotifierProxyProvider<Auth, ProfileProvider>(
+            create: (_) => ProfileProvider(),
+            update: (_, auth, prevProf) =>
+                prevProf..update(auth.token(), auth.userId),
           ),
         ],
         child: Consumer<Auth>(
@@ -65,8 +72,7 @@ class _HomePageState extends State<HomePage> {
 
   List<Widget> _widgetOptions = <Widget>[
     Home(),
-    Text('Search Page',
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    Activity(),
     Profile(),
     Settings(),
   ];
@@ -75,6 +81,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     Provider.of<NotesProvider>(context, listen: false).getDataFromServer();
     Provider.of<GroupProvider>(context, listen: false).setAndFetchGroup();
+    Provider.of<ProfileProvider>(context, listen: false).getProfileFromServer();
     super.initState();
   }
 
